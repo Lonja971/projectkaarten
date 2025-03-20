@@ -17,6 +17,7 @@ use App\Models\Role;
 class RegisteredUserController extends Controller
 {
     /**
+     * 
      * Display the registration view.
      */
     public function create(): View
