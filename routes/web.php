@@ -2,20 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\TeacherMiddleware;
 
 //---AUTH---
 
 require __DIR__.'/auth.php';
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
 //---HOME---
 
@@ -25,10 +16,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 //---USERS---
 
 use App\Http\Controllers\UserController;
-Route::prefix('/users/')->group(function () {             //---For-future:-Only-Docenten
-    Route::get('/', [UserController::class, 'index'])->name('users.index')->middleware(['auth', 'verified']);
-    Route::get('{user_nr?}', [UserController::class, 'show'])->name('users.show')->middleware(['auth', 'verified']);
-    Route::get('{user_nr}', [UserController::class, 'edit'])->name('users.edit')->middleware(['auth', 'verified']);
+Route::prefix('/admin/')->middleware(TeacherMiddleware::class)->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::get('{user_nr?}', [UserController::class, 'show'])->name('users.show');
+    Route::get('{user_nr}', [UserController::class, 'edit'])->name('users.edit');
 });
 
 //---PROJECTS---
