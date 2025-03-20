@@ -22,6 +22,11 @@ Route::middleware('auth')->group(function () {
 use App\Http\Controllers\HomeController;    
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+//---HELP---
+
+use App\Http\Controllers\HelpController;
+Route::get('/help', [HelpController::class, 'index'])->name('help')->middleware(['auth', 'verified']);
+
 //---USERS---
 
 use App\Http\Controllers\UserController;
