@@ -2,7 +2,7 @@
 
 @if (Route::has('login'))
 @auth
-   <h3><a href="{{ url('/dashboard') }}">{{ Auth::user()->name }}</a>, u bent geregistreerd!!</h3>
+   <h3><a href="{{ url('/dashboard') }}">{{ Auth::user()->full_name }}</a>, u bent geregistreerd!!</h3>
    <form method="POST" action="{{ route('logout') }}" class="mt-4">
       @csrf
       <button type="submit">Logout</button>
