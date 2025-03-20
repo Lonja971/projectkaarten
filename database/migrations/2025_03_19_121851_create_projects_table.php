@@ -28,6 +28,8 @@ return new class extends Migration
             $table->string('denial_reason')->nullable();
             $table->foreignId('status_id')->constrained('project_statuses')->onDelete('cascade');
             $table->timestamps();
+            $table->string('color')->nullable();
+            $table->string('icon')->nullable();
         });
 
         Schema::create('project_goals', function (Blueprint $table) {
