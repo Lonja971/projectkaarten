@@ -19,9 +19,24 @@
             <x-input-error :messages="$errors->get('full_name')" class="mt-2" />
         </div>
 
+        <!-- Role -->
+        <select id="role" name="role_id">
+            @foreach($roles as $role)
+                <option value="{{$role->id}}"
+                    {{ old('role_id', 2) == $role->id ? 'selected' : '' }}>
+                    {{ $role->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('role_id')
+            <div class="text-red-500">{{ $message }}</div>
+        @enderror
+
         <!-- Student Number -->
-        <label for="student_nr">Student Number</label>
-        <input id="student_nr" type="number" name="student_nr" value="{{ old('student_nr') }}" required>
+        <div id="student_nr_block">
+            <label for="student_nr">Student Number</label>
+            <input id="student_nr" type="number" name="student_nr" value="{{ old('student_nr') }}" required>
+        </div>
 
         @error('student_nr')
             <div class="text-red-500">{{ $message }}</div>
@@ -57,26 +72,30 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <!-- Role -->
-        <select id="role" name="role_id">
-            @foreach($roles as $role)
-                <option value="{{$role->id}}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                    {{ $role->name }}
-                </option>
-            @endforeach
-        </select>
-        @error('role_id')
-            <div class="text-red-500">{{ $message }}</div>
-        @enderror
-
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
             <x-primary-button class="ms-4">
                 {{ __('Register') }}
             </x-primary-button>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const roleSelect = document.getElementById("role");
+                const studentNrBlock = document.getElementById("student_nr_block");
+                const studentNrinput = document.getElementById("student_nr");
+        
+                function toggleStudentNr() {
+                    if (roleSelect.value == "1") {
+                        studentNrBlock.style.display = "none";
+                        studentNrinput.value = false;
+                    } else {
+                        studentNrBlock.style.display = "block";
+                    }
+                }
+        
+                toggleStudentNr();
+        
+                roleSelect.addEventListener("change", toggleStudentNr);
+            });
+        </script>
     </form>
 </x-guest-layout>
