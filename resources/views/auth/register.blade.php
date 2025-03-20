@@ -2,12 +2,30 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+        @if ($errors->any())
+            <div class="text-red-500">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <x-text-input id="full_name" class="block mt-1 w-full" type="text" name="full_name" :value="old('full_name')" required autofocus autocomplete="full_name" />
+            <x-input-error :messages="$errors->get('full_name')" class="mt-2" />
         </div>
+
+        <!-- Student Number -->
+        <label for="student_nr">Student Number</label>
+        <input id="student_nr" type="number" name="student_nr" value="{{ old('student_nr') }}" required>
+
+        @error('student_nr')
+            <div class="text-red-500">{{ $message }}</div>
+        @enderror
 
         <!-- Email Address -->
         <div class="mt-4">
@@ -38,6 +56,18 @@
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
+
+        <!-- Role -->
+        <select id="role" name="role_id">
+            @foreach($roles as $role)
+                <option value="{{$role->id}}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                    {{ $role->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('role_id')
+            <div class="text-red-500">{{ $message }}</div>
+        @enderror
 
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
