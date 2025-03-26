@@ -1,3 +1,3 @@
 <h1>Project Page</h1>
-<div>Project: {{ $project_by_user_nr ? $project_by_user_nr : "Not provided" }} , by user: {{ $user_nr }}</div>
+<div>Project: {{ $project_by_user_identifier ? $project_by_user_identifier : "Not provided" }} , by user: {{ $user_identifier }}</div>
 <a href="{{ route('home') }}">To Home page</a>
