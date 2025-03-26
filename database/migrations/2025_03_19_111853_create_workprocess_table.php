@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('core_tasks', function (Blueprint $table) {
+        Schema::create('workprocesses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('description');
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('core_tasks');
+        Schema::dropIfExists('workprocesses');
     }
 };

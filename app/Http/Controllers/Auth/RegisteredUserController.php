@@ -43,7 +43,7 @@ class RegisteredUserController extends Controller
 
         if ($request->role_id != 1)
         {
-            $rules['student_nr'] = ['required', 'integer', 'unique:users,student_nr'];
+            $rules['identifier'] = ['required', 'integer', 'unique:users,identifier'];
         }
     
         $validatedData = $request->validate($rules);
@@ -51,13 +51,13 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'full_name' => $validatedData['full_name'],
             'role_id' => $validatedData['role_id'],
-            'student_nr' => $validatedData['student_nr'] ?? null,
+            'identifier' => $validatedData['identifier'] ?? null,
             'email' => $validatedData['email'],
             'password' => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
 
-        return redirect('/admin/'.$request->student_nr);
+        return redirect('/admin/'.$request->identifier);
     }
 }
