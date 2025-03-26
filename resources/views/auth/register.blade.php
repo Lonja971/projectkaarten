@@ -33,12 +33,12 @@
         @enderror
 
         <!-- Student Number -->
-        <div id="student_nr_block">
-            <label for="student_nr">Student Number</label>
-            <input id="student_nr" type="number" name="student_nr" value="{{ old('student_nr') }}" required>
+        <div id="identifier_block">
+            <label for="identifier">Student Number</label>
+            <input id="identifier" type="number" name="identifier" value="{{ old('identifier') }}" required>
         </div>
 
-        @error('student_nr')
+        @error('identifier')
             <div class="text-red-500">{{ $message }}</div>
         @enderror
 
@@ -80,8 +80,8 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const roleSelect = document.getElementById("role");
-                const studentNrBlock = document.getElementById("student_nr_block");
-                const studentNrInput = document.getElementById("student_nr");
+                const studentNrBlock = document.getElementById("identifier_block");
+                const studentNrInput = document.getElementById("identifier");
         
                 function toggleStudentNr() {
                     if (roleSelect.value == "1") {
@@ -92,7 +92,7 @@
                     } else {
                         studentNrBlock.style.display = "block";
                         studentNrInput.setAttribute("required", "required");
-                        studentNrInput.setAttribute("name", "student_nr");
+                        studentNrInput.setAttribute("name", "identifier");
                     }
                 }
         
