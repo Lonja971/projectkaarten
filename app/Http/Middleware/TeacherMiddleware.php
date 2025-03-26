@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Config;
 
 class TeacherMiddleware
 {
@@ -13,11 +14,11 @@ class TeacherMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role = 1): Response
+    public function handle(Request $request, Closure $next): Response
     {
 
-        if (!auth()->check() || auth()->user()->role_id != $role) {
-            abort(403, 'Unauthorized access | Only for Docenten');
+        if (!auth()->check() || auth()->user()->role_id != Config::get('constants.roles.teacher')) {
+            abort(403, 'Unauthorized access');
         }
 
         return $next($request);
