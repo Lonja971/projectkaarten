@@ -81,14 +81,18 @@
             document.addEventListener("DOMContentLoaded", function () {
                 const roleSelect = document.getElementById("role");
                 const studentNrBlock = document.getElementById("student_nr_block");
-                const studentNrinput = document.getElementById("student_nr");
+                const studentNrInput = document.getElementById("student_nr");
         
                 function toggleStudentNr() {
                     if (roleSelect.value == "1") {
                         studentNrBlock.style.display = "none";
-                        studentNrinput.value = false;
+                        studentNrInput.value = false;
+                        studentNrInput.removeAttribute("required");
+                        studentNrInput.removeAttribute("name");
                     } else {
                         studentNrBlock.style.display = "block";
+                        studentNrInput.setAttribute("required", "required");
+                        studentNrInput.setAttribute("name", "student_nr");
                     }
                 }
         
