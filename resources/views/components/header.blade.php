@@ -15,7 +15,7 @@
         @if ($user)
             <span class="text-[24px] font-bold font-[Inter] text-[#fff]">{{ $user->full_name }}</span>
             @if ($user->role && $user->role->name === "Student")
-                <span class="text-[24px] font-bold font-[Inter] text-[#fff]">{{ $user->student_nr }}</span>
+                <span class="text-[24px] font-bold font-[Inter] text-[#fff]">{{ $user->identifier }}</span>
             @endif
         @endif 
     </div>

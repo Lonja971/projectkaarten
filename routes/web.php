@@ -23,33 +23,28 @@ Route::get('/help', [HelpController::class, 'index'])->name('help')->middleware(
 use App\Http\Controllers\UserController;
 Route::prefix('admin')->middleware(TeacherMiddleware::class)->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('users.index');
-    Route::get('/{user_nr}', [UserController::class, 'show'])->name('users.show');
-    Route::get('/{user_nr}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::get('/{user_identifier}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/{user_identifier}/edit', [UserController::class, 'edit'])->name('users.edit');
+
+    Route::any('{any}', function () {
+        abort(404);
+    })->where('any', '.*');
 });
 
 //---PROJECTS---
 
 use App\Http\Controllers\ProjectController;
-Route::get('{user_nr}/', [ProjectController::class, 'index'])
+Route::get('{user_identifier}/', [ProjectController::class, 'index'])
     ->name('projects.index')
-    ->middleware(['auth', 'verified'])
-    ->where([
-        'user_nr' => '[0-9]+'
-    ]);
+    ->middleware(['auth', 'verified']);
 
-Route::get('{user_nr}/{project_by_user_nr?}', [ProjectController::class, 'show'])
+Route::get('{user_identifier}/{project_by_user_identifier?}', [ProjectController::class, 'show'])
     ->name('projects.show')
-    ->middleware(['auth', 'verified'])
-    ->where([
-        'user_nr' => '[0-9]+'
-    ]);
+    ->middleware(['auth', 'verified']);
 
 //---SPRINTS---
 
 use App\Http\Controllers\SprintController;
-Route::get('{user_nr}/{project_by_user_nr}/{sprint_week_nr?}', [SprintController::class, 'show'])
+Route::get('{user_nr}/{project_by_user_identifier}/{sprint_week_nr?}', [SprintController::class, 'show'])
     ->name('sprints.show')
-    ->middleware(['auth', 'verified'])
-    ->where([
-        'user_nr' => '[0-9]+'
-    ]);
+    ->middleware(['auth', 'verified']);

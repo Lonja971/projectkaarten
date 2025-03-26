@@ -32,13 +32,13 @@
             <div class="text-red-500">{{ $message }}</div>
         @enderror
 
-        <!-- Student Number -->
-        <div id="student_nr_block">
-            <label for="student_nr">Student Number</label>
-            <input id="student_nr" type="number" name="student_nr" value="{{ old('student_nr') }}" required>
+        <!-- dwdew -->
+        <div id="identifier_block">
+            <label for="identifier">Student Number</label>
+            <input id="identifier" type="text" name="identifier" value="{{ old('identifier') }}" required>
         </div>
 
-        @error('student_nr')
+        @error('identifier')
             <div class="text-red-500">{{ $message }}</div>
         @enderror
 
@@ -77,29 +77,5 @@
                 {{ __('Register') }}
             </x-primary-button>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const roleSelect = document.getElementById("role");
-                const studentNrBlock = document.getElementById("student_nr_block");
-                const studentNrInput = document.getElementById("student_nr");
-        
-                function toggleStudentNr() {
-                    if (roleSelect.value == "1") {
-                        studentNrBlock.style.display = "none";
-                        studentNrInput.value = false;
-                        studentNrInput.removeAttribute("required");
-                        studentNrInput.removeAttribute("name");
-                    } else {
-                        studentNrBlock.style.display = "block";
-                        studentNrInput.setAttribute("required", "required");
-                        studentNrInput.setAttribute("name", "student_nr");
-                    }
-                }
-        
-                toggleStudentNr();
-        
-                roleSelect.addEventListener("change", toggleStudentNr);
-            });
-        </script>
     </form>
 </x-guest-layout>

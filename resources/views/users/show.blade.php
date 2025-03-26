@@ -1,1 +1,1 @@
-<h1>User Page with id: {{ $user_id }}</h1>
+<h1>User Page with id: {{ $user_identifier_uppercase }}</h1>
