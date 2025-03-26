@@ -32,10 +32,10 @@
             <div class="text-red-500">{{ $message }}</div>
         @enderror
 
-        <!-- Student Number -->
+        <!-- dwdew -->
         <div id="identifier_block">
             <label for="identifier">Student Number</label>
-            <input id="identifier" type="number" name="identifier" value="{{ old('identifier') }}" required>
+            <input id="identifier" type="text" name="identifier" value="{{ old('identifier') }}" required>
         </div>
 
         @error('identifier')
@@ -77,29 +77,5 @@
                 {{ __('Register') }}
             </x-primary-button>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const roleSelect = document.getElementById("role");
-                const studentNrBlock = document.getElementById("identifier_block");
-                const studentNrInput = document.getElementById("identifier");
-        
-                function toggleStudentNr() {
-                    if (roleSelect.value == "1") {
-                        studentNrBlock.style.display = "none";
-                        studentNrInput.value = false;
-                        studentNrInput.removeAttribute("required");
-                        studentNrInput.removeAttribute("name");
-                    } else {
-                        studentNrBlock.style.display = "block";
-                        studentNrInput.setAttribute("required", "required");
-                        studentNrInput.setAttribute("name", "identifier");
-                    }
-                }
-        
-                toggleStudentNr();
-        
-                roleSelect.addEventListener("change", toggleStudentNr);
-            });
-        </script>
     </form>
 </x-guest-layout>

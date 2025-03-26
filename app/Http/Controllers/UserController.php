@@ -11,15 +11,16 @@ class UserController extends Controller
         return view('users.index');
     }
 
-    public function show($user_id = null)
+    public function show($user_identifier = null)
     {
-        return view('users.show', compact('user_id'));
+        $user_identifier_uppercase = strtoupper($user_identifier);
+        return view('users.show', compact('user_identifier', 'user_identifier_uppercase'));
     }
     
-    public function edit($user_id)
+    public function edit($user_identifier)
     {
         //Edit-logic
 
-        return redirect()->route('users.show', compact('user_id'));
+        return redirect()->route('users.show', compact('user_identifier'));
     }
 }
