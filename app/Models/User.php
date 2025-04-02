@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Role; // Add this line to import the Role model
+use App\Models\Project; // Add this line to import the Project model
 
 class User extends Authenticatable
 {
@@ -50,10 +51,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role that the user belongs to.
+     * Get the role associated with the user.
      */
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+    
+    /**
+     * Get the projects belonging to the user.
+     */
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
     }
 }
