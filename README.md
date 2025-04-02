@@ -7,21 +7,21 @@
 Het project is ontworpen om een ​​online kaartenproject voor studenten te maken.
 
 
-## Run Locally
+## Lokaal uitvoeren
 
-### Clone the project
+### Kloon het project
 
 ```bash
   git clone https://github.com/Lonja971/projectkaarten.git
 ```
 
-### Go to the project directory
+### Ga naar de projectdirectory
 
 ```bash
   cd projectkaarten
 ```
 
-### Install Laravel dependencies
+### Laravel-afhankelijkheden installeren
 
 ```bash
   php artisan install
@@ -31,7 +31,13 @@ Het project is ontworpen om een ​​online kaartenproject voor studenten te ma
 
 Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie toe.
 
-### Start the server
+### Migreer de database
+
+```bash
+  php artisan migrate
+```
+
+### Start de server
 
 ```bash
   php artisan serve
@@ -39,18 +45,18 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 
 
-## API Reference
+## API-referentie
 
-#### Get all users ( paginate - 10 )
+#### Alle gebruikers ophalen ( paginate - 10 )
 
 ```http
   GET | /api/users
 ```
 
-#### Store new user
+#### Nieuwe gebruiker opslaan
 
 ```http
-  POST | /api/users/
+  POST | /api/users?full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
 ```
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
@@ -60,22 +66,22 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 | `email`      | `string` | **Required**. Email |
 | `password`      | `string` | **Required**. Password |
 
-#### Get user
+#### Gebruiker ophalen by id
 
 ```http
-  GET | /api/users/${id}
+  GET | /api/users/${id}?column=${column}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
 | `id`      | `string` | **Required**. Id of item to fetch |
-| `data`    | `string` | De naam van de parameter die u wilt ophalen |
+| `column`    | `string` | De naam van de parameter die u wilt ophalen |
 
 
-#### Update user
+#### Gebruiker bijwerken
 
 ```http
-  PATCH/PUT | /api/users/${id}
+  PATCH/PUT | /api/users/${id}?full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
 ```
 
 | Parameter | Type     | Description                       |
@@ -87,7 +93,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 | `email`      | `string` | Email |
 | `password`      | `string` | Password |
 
-#### Destroy user
+#### Gebruiker vernietigen
 
 ```http
   DELETE | /api/users/${id}
@@ -97,19 +103,19 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 | :-------- | :------- | :-------------------------------- |
 | `id`      | `string` | **Required**. Id of item to fetch |
 
-#### Search user (find user id)
+#### Zoek gebruiker (vind gebruikers-id)
 
 ```http
-  GET | /api/users/search
+  GET | /api/users/search?column=${column}&value=${value}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `data` | `string` | **Required**. Op welke parameter zoeken we (bijvoorbeeld `full_name`) |
-| `input` | `string` | **Required**. Uw zoekinhoud|
+| `column` | `string` | **Required**. Op welke parameter zoeken we (bijvoorbeeld `full_name`) |
+| `value` | `string` | **Required**. Uw zoekinhoud|
 
 
-## Authors
+## Auteurs
 
 - [@Lonja971](https://github.com/Lonja971)
 - [@KyanuDeltion](https://github.com/KyanuDeltion)

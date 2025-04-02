@@ -31,9 +31,9 @@ class UserController extends Controller
         ], 201);
     }
 
-    public function show(Request $request, string $id) //   GET | http://127.0.0.1:8000/api/users/{id}?data={full_name}
+    public function show(Request $request, string $id) //   GET | http://127.0.0.1:8000/api/users/{id}?column={full_name}
     {   
-        $data = $request->query('data');
+        $column = $request->query('column');
         $user = User::find($id);
 
         if (!$user){
@@ -42,21 +42,21 @@ class UserController extends Controller
             ], 404);
         }
 
-        if ($data){
-            if (!$user[$data]){
+        if ($column){
+            if (!$user[$column]){
                 return response()->json([
-                    'error' => 'User data in field '.$data.' was not found'
+                    'error' => 'User data in field '.$column.' was not found'
                 ], 404);
             }
             
             return response()->json([
-                'data' => $user[$data]
-            ], 201);
-        }else{
-            return response()->json([
-                'data' => new UserResource($user)
+                'data' => $user[$column]
             ], 201);
         }
+        
+        return response()->json([
+            'data' => new UserResource($user)
+        ], 201);
     }
 
     public function update(UpdateUserRequest $request, string $id) //   PATCH/PUT | http://127.0.0.1:8000/api/users/{id}?full_name={full_name}&email={email}
@@ -115,23 +115,23 @@ class UserController extends Controller
         ], 201);
     }
 
-    public function search(Request $request) //   GET | http://127.0.0.1:8000/api/users/search?data={full_name}&input={input}
+    public function search(Request $request) //   GET | http://127.0.0.1:8000/api/users/search?column={full_name}&value={value}
     {
-        $data = $request->query('data');
-        $input = $request->query('input');
+        $column = $request->query('column');
+        $value = $request->query('value');
 
-        if (!$data || !$input) {
+        if (!$column || !$value) {
             $missingParams = [];
-            if (!$data) {
-                $missingParams[] = 'data';
+            if (!$column) {
+                $missingParams[] = 'column';
             }
-            if (!$input) {
-                $missingParams[] = 'input';
+            if (!$value) {
+                $missingParams[] = 'value';
             }
             return response()->json(['error' => 'Missing search parameters (' . implode(', ', $missingParams) . ')'], 400);
         }
 
-        $users = User::where($data, 'LIKE', "%$input%")->get();
+        $users = User::where($column, 'LIKE', "%$value%")->get();
 
         $users_id = [];
         foreach ($users as $user) {
@@ -146,8 +146,8 @@ class UserController extends Controller
             return response()->json([
                 'error' => 'Not found',
                 'data' => [
-                    'column' => $data,
-                    'value' => $input,
+                    'column' => $column,
+                    'value' => $value,
                 ]
             ], 404);
         }
