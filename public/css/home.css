@@ -1,0 +1,31 @@
+.hidden-input {
+    display: none;
+}
+
+label:hover {
+    border-color: #ef7e05;   
+}
+
+label.checked {
+    color: #ffffff;
+    border-color: #ef7e05;
+    background-color: #ef7e05;
+    font-weight: bold;
+}
+
+.hidden {   
+    display: none;
+}
+
+/* Active navigation button styling */
+.active-nav-button, 
+#filter-toggle-button.active-nav-button {
+    background-color: #ef7e05 !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-color: #ef7e05 !important;
+}
+
+#filter-toggle-button:hover, #my-projects-button:hover, #students-button:hover, #projects-button:hover {
+    border-color: #ef7e05;   
+}

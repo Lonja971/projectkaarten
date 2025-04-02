@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('project_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('color')->nullable();
+            $table->boolean('filled')->nullable();
         });
 
         Schema::create('projects', function (Blueprint $table) {
@@ -28,8 +30,19 @@ return new class extends Migration
             $table->string('denial_reason')->nullable();
             $table->foreignId('status_id')->constrained('project_statuses')->onDelete('cascade');
             $table->timestamps();
-            $table->string('color')->nullable();
-            $table->string('icon')->nullable();
+            $table->string('icon_id')->nullable();
+            $table->string('background_id')->nullable();
+            $table->integer('project_by_student');
+        });
+
+        Schema::create('icons', function (Blueprint $table) {
+            $table->id();
+            $table->string('icon');
+        });
+
+        Schema::create('backgrounds', function (Blueprint $table) {
+            $table->id();
+            $table->string('background_color');
         });
 
         Schema::create('project_goals', function (Blueprint $table) {
@@ -39,10 +52,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('project_core_tasks', function (Blueprint $table) {
+        Schema::create('project_workprocesses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_goal_id')->constrained('project_goals')->onDelete('cascade');
-            $table->foreignId('core_task_id')->constrained('core_tasks')->onDelete('cascade');
+            $table->foreignId('workprocess_id')->constrained('workprocesses')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -52,7 +65,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_core_tasks');
+        Schema::dropIfExists('project_workprocesses');
         Schema::dropIfExists('project_goals');
         Schema::dropIfExists('projects');
         Schema::dropIfExists('project_statuses');
