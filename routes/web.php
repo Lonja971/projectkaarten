@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\TeacherMiddleware;
 
 //---AUTH---
 
 require __DIR__.'/auth.php';
+require __DIR__.'/api.php';
 
 //---HOME---
 
@@ -15,13 +15,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 //---HELP---
 
-use App\Http\Controllers\HelpController;
 Route::get('/help', [HelpController::class, 'index'])->name('help')->middleware(['auth', 'verified']);
 
 //---USERS---
 
 use App\Http\Controllers\UserController;
-Route::prefix('admin')->middleware(TeacherMiddleware::class)->group(function () {
+Route::prefix('admin')->middleware('auth.teacher')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/{user_identifier}', [UserController::class, 'show'])->name('admin.users.show');
     Route::get('/{user_identifier}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
