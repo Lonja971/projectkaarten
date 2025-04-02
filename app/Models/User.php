@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Project::class);
     }
+    
+    public static function isTeacher($user_id)
+    {
+        return User::where('id', $user_id)->where('role_id', 1)->exists();
+    }
 }

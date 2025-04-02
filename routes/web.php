@@ -17,7 +17,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/help', [HelpController::class, 'index'])->name('help')->middleware(['auth', 'verified']);
 
-//---USERS---
+//---ADMIN---
 
 use App\Http\Controllers\UserController;
 Route::prefix('admin')->middleware('auth.teacher')->group(function () {
