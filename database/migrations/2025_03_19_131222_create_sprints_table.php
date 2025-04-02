@@ -33,10 +33,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('sprint_core_tasks', function (Blueprint $table) {
+        Schema::create('sprint_workprocesses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sprint_goal_id')->constrained('sprint_goals')->onDelete('cascade');
-            $table->foreignId('core_task_id')->constrained('core_tasks')->onDelete('cascade');
+            $table->foreignId('workprocess_id')->constrained('workprocesses')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -46,7 +46,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sprint_core_tasks');
+        Schema::dropIfExists('sprint_workprocesses');
         Schema::dropIfExists('sprint_goals');
         Schema::dropIfExists('sprints');
         Schema::dropIfExists('sprint_statuses');
