@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //})->middleware('auth:sanctum');
 
-//---USER---
+//---USERS---
 
 use App\Http\Controllers\Api\UserController;
 
@@ -20,3 +21,7 @@ Route::middleware('api_key')
 Route::middleware('api_key.teacher')
     ->apiResource('/users', UserController::class)
     ->except(['show']);
+
+//---PROJECTS---
+
+Route::middleware('api_key')->apiResource('/projects', ProjectController::class);

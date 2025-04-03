@@ -21,4 +21,9 @@ class ApiKey extends Model
     {
         return self::where('api_key', $apiKey)->exists();
     }
+
+    public static function getUserId($api_key): ?int
+    {
+        return ApiKey::where('api_key', $api_key)->value('user_id');
+    }
 }

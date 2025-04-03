@@ -28,7 +28,7 @@ return new class extends Migration
             $table->integer('rating')->nullable();
             $table->string('feedback')->nullable();
             $table->string('denial_reason')->nullable();
-            $table->foreignId('status_id')->constrained('project_statuses')->onDelete('cascade');
+            $table->foreignId('status_id')->constrained('project_statuses')->onDelete('cascade')->default(env('DEFAULT_PROJECT_STATUS_ID'));
             $table->timestamps();
             $table->string('icon_id')->nullable();
             $table->string('background_id')->nullable();

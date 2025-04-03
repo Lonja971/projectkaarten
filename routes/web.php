@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HelpController;
 use Illuminate\Support\Facades\Route;
 
 //---AUTH---

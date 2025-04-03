@@ -50,20 +50,22 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 #### Alle gebruikers ophalen ( paginate - 10 )
 
 ```http
-  GET | /api/users?api_key=${api_key}
+  ${domain}/api/users?api_key=${api_key}
 ```
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
+| `Method` | `GET` |  |
 | `api_key` | `string` | **Required**. Api key |
 
 #### Nieuwe gebruiker opslaan
 
 ```http
-  POST | /api/users?api_key=${api_key}&full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
+  ${domain}/api/users?api_key=${api_key}&full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
+| `Method` | `POST` |  |
 | `api_key` | `string` | **Required**. Api key |
 | `full_name` | `string` | **Required**. Volledige gebruikersnaam |
 | `identifier`    | `string` | **Required**. Gebruikers-ID (bijvoorbeeld leerling- of docentnummer) |
@@ -74,11 +76,12 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 #### Gebruiker ophalen by id
 
 ```http
-  GET | /api/users/${id}?api_key=${api_key}&column=${column}
+  ${domain}/api/users/${id}?api_key=${api_key}&column=${column}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
+| `Method` | `GET` |  |
 | `api_key` | `string` | **Required**. Api key |
 | `id`      | `string` | **Required**. Id of item to fetch |
 | `column`    | `string` | De naam van de parameter die u wilt ophalen |
@@ -87,11 +90,12 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 #### Gebruiker bijwerken
 
 ```http
-  PATCH/PUT | /api/users/${id}?api_key=${api_key}&full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
+  ${domain}/api/users/${id}?api_key=${api_key}&full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
+| `Method` | `PATCH/PUT` |  |
 | `api_key` | `string` | **Required**. Api key |
 | `id`      | `string` | **Required**. Id of item to fetch |
 | `full_name` | `string` | Volledige gebruikersnaam |
@@ -103,22 +107,24 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 #### Gebruiker vernietigen
 
 ```http
-  DELETE | /api/users/${id}?api_key=${api_key}
+  ${domain}/api/users/${id}?api_key=${api_key}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
+| `Method` | `DELETE` |  |
 | `api_key` | `string` | **Required**. Api key |
 | `id`      | `string` | **Required**. Id of item to fetch |
 
 #### Zoek gebruiker (vind gebruikers-id)
 
 ```http
-  GET | /api/users/search?api_key=${api_key}&column=${column}&value=${value}
+  ${domain}/api/users/search?api_key=${api_key}&column=${column}&value=${value}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
+| `Method` | `GET` |  |
 | `api_key` | `string` | **Required**. Api key |
 | `column` | `string` | **Required**. Op welke parameter zoeken we (bijvoorbeeld `full_name`) |
 | `value` | `string` | **Required**. Uw zoekinhoud|
