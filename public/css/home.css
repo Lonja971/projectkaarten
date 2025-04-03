@@ -10,7 +10,6 @@ label.checked {
     color: #ffffff;
     border-color: #ef7e05;
     background-color: #ef7e05;
-    font-weight: bold;
 }
 
 .hidden {   
@@ -22,7 +21,6 @@ label.checked {
 #filter-toggle-button.active-nav-button {
     background-color: #ef7e05 !important;
     color: #ffffff !important;
-    font-weight: bold !important;
     border-color: #ef7e05 !important;
 }
 

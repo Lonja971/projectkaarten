@@ -20,16 +20,33 @@
       @if ($user)
          <x-navigation-buttons :user="$user" />
          
-         <!-- Projects content - visible by default -->
-         <div id="projects-content">
-            <x-filter-section :statuses="$statuses ?? []" />
-            <x-project-cards :projects="$projects ?? []" :user="$user" />
-         </div>
-         
-         <!-- Students content - hidden by default -->
-         <div id="students-content" class="hidden">
-            <x-student-filter-section :roles="$roles ?? []" />
-            <x-student-list :users="$students ?? []" :user="$user" />
+         <!-- Main content area with sidebar-content layout -->
+         <div class="flex flex-row flex-grow">
+            <!-- Sidebar for filters - 18% width -->
+            <div id="sidebar" class="min-w-[330px] max-w-[330px] border-r border-[#ddd]">
+               <!-- Projects filters - visible when projects tab is active -->
+               <div id="projects-filters">
+                  <x-filter-section :statuses="$statuses ?? []" :schoolyears="$schoolyears ?? []" :projectFilters="$projectFilters ?? ['sort' => 'creation-date-asc', 'name' => '']" />
+               </div>
+               
+               <!-- Students filters - visible when students tab is active -->
+               <div id="students-filters" class="hidden">
+                  <x-student-filter-section :roles="$roles ?? []" :studentFilters="$studentFilters ?? ['sort' => 'name-asc', 'name' => '', 'identifier' => '']" />
+               </div>
+            </div>
+            
+            <!-- Main content area - 82% width -->
+            <div class="w-full">
+               <!-- Projects content - visible by default -->
+               <div id="projects-content">
+                  <x-project-cards :projects="$projects ?? []" :user="$user" />
+               </div>
+               
+               <!-- Students content - hidden by default -->
+               <div id="students-content" class="hidden">
+                  <x-student-list :users="$students ?? []" :user="$user" />
+               </div>
+            </div>
          </div>
       @else
          <x-login-required />
@@ -43,5 +60,6 @@
       <script src="{{ asset('js/filter.js') }}"></script>
       <script src="{{ asset('js/navigation.js') }}"></script>
       <script src="{{ asset('js/student-filter.js') }}"></script>
+      <script src="{{ asset('js/auto-switch-tab.js') }}"></script>
    </body>
 </html>
