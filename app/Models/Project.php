@@ -20,6 +20,11 @@ class Project extends Model
     {
         return $this->belongsTo(ProjectStatus::class);
     }
+
+    public function sprints()
+    {
+        return $this->hasMany(Sprint::class);
+    }
     
     public function user()
     {

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HelpController;
 use Illuminate\Support\Facades\Route;
 
 //---AUTH---
@@ -17,7 +17,7 @@ Route::match(['get', 'post'], '/', [HomeController::class, 'index'])->name('home
 
 Route::get('/help', [HelpController::class, 'index'])->name('help')->middleware(['auth', 'verified']);
 
-//---USERS---
+//---ADMIN---
 
 use App\Http\Controllers\UserController;
 Route::prefix('admin')->middleware('auth.teacher')->group(function () {
