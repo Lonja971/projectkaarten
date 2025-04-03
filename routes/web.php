@@ -11,7 +11,7 @@ require __DIR__.'/api.php';
 //---HOME---
 
 use App\Http\Controllers\HomeController;    
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::match(['get', 'post'], '/', [HomeController::class, 'index'])->name('home');
 
 //---HELP---
 
