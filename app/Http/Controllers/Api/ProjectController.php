@@ -19,7 +19,7 @@ class ProjectController extends Controller
     public function index()
     {
         return response()->json([
-            ProjectResource::collection(Project::query()->orderBy('id', 'desc')->paginate(10))
+            Project::query()->orderBy('id', 'asc')->paginate(10)
         ]);
     }
 
@@ -31,7 +31,8 @@ class ProjectController extends Controller
         $data = $request->validated();
 
         $current_user_id = ApiKey::getUserId($data['api_key']);
-        if ($current_user_id){
+
+        if ($current_user_id) {
             $data['user_id'] = $current_user_id;
             unset($data['api_key']);
         }
@@ -42,7 +43,7 @@ class ProjectController extends Controller
         $new_project = Project::create($data);
 
         Sprint::setSprintsForProject($new_project->id, $new_project->date_start, $new_project->date_end);
-        
+
         return response()->json([
             'data' => new ProjectResource($new_project)
         ]);
@@ -53,8 +54,14 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
+        $project = Project::with(['sprints.status', 'status'])->find($id);
+        if (!$project) {
+            return response()->json([
+                'error' => 'Project Not Found'
+            ], 404);
+        }
         return response()->json([
-            'data' => new ProjectResource(Project::with(['sprints.status', 'status'])->find($id))
+            'data' => new ProjectResource($project)
         ], 201);
     }
 
@@ -63,18 +70,36 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, string $id)
     {
+        $teacherFields = [
+            'reflection',
+            'raiting',
+            'feedback',
+            'denial_reason',
+            'status_id',
+        ];
         $data = $request->validated();
-    
         $project = Project::find($id);
-    
+        $current_user_id = ApiKey::getUserId($data['api_key']);
+        $isTeacher = User::isTeacher($current_user_id);
+        $isOwner = Project::getUserIdByProjectId($project->id) == $current_user_id;
+        
+        if (!$isTeacher && !$isOwner) {
+            return response()->json(['error' => 'Access is denied'], 403);
+        }
+        
+        if (!$isTeacher) {
+            $data = array_diff_key($data, array_flip($teacherFields));
+        }
+
         if (!$project) {
             return response()->json(['error' => 'Project with this ID does not exist'], 404);
         }
-    
+
         if (empty($data)) {
             return response()->json(['error' => 'There is no data to update.'], 400);
         }
-    
+        unset($data['api_key']);
+
         $unchanged = true;
         foreach ($data as $key => $value) {
             if ($project->$key !== $value) {
@@ -82,13 +107,13 @@ class ProjectController extends Controller
                 break;
             }
         }
-    
+
         if ($unchanged) {
             return response()->json(['error' => 'No changes detected'], 200);
         }
-    
+
         $project->update($data);
-    
+
         return response()->json([
             'message' => 'User updated successfully',
             'data' => new ProjectResource($project)
@@ -101,7 +126,7 @@ class ProjectController extends Controller
     public function destroy(string $id)
     {
         $project = Project::find($id);
-        if (!$project){
+        if (!$project) {
             return response()->json([
                 'error' => 'Project with this id does not exist'
             ], 404);

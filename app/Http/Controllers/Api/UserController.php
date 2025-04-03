@@ -15,7 +15,7 @@ class UserController extends Controller
     public function index() //   GET | http://127.0.0.1:8000/api/users
     {
         return response()->json([
-            User::query()->orderBy('id', 'desc')->paginate(10)
+            User::query()->orderBy('id', 'asc')->paginate(10)
         ]);
     }
 

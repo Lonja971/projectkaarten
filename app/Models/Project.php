@@ -129,4 +129,9 @@ class Project extends Model
         
         return $schoolyears;
     }
+
+    public static function getUserIdByProjectId(int $project_id)
+    {
+        return Project::where('id', $project_id)->value('user_id');
+    }
 }
