@@ -8,78 +8,86 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Models\ApiKey;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
 
-    public function index() //   GET | http://127.0.0.1:8000/api/users
+    public function index()
     {
         return response()->json([
-            User::query()->orderBy('id', 'desc')->paginate(10)
+            User::query()->orderBy('id', 'asc')->paginate(10)
         ]);
     }
 
-    public function store(StoreUserRequest $request) //   POST | http://127.0.0.1:8000/api/users?full_name={full_name}&identifier={identifier}&role_id={role_id}&email={email}&password={password}
+    public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
 
         $data['email'] = strtolower($data['email']);
         $data['identifier'] = strtolower($data['identifier']);
+        $password = Str::random(12);
+        $data['password'] = Hash::make($password);
+
+        $user = new UserResource(User::create($data));
+        $api_key = ApiKey::setApiKeyForUser($user->id);
 
         return response()->json([
-            'data' => new UserResource(User::create($data)),
+            'data' => array_merge($user->toArray(request()), ['api_key' => $api_key->api_key]),
         ], 201);
     }
 
-    public function show(Request $request, string $id) //   GET | http://127.0.0.1:8000/api/users/{id}?column={full_name}
-    {   
+    public function show(Request $request, string $id)
+    {
         $column = $request->query('column');
         $user = User::find($id);
 
-        if (!$user){
+        if (!$user) {
             return response()->json([
                 'error' => 'User Not Found'
             ], 404);
         }
 
-        if ($column){
-            if (!$user[$column]){
+        if ($column) {
+            if (!$user[$column]) {
                 return response()->json([
-                    'error' => 'User data in field '.$column.' was not found'
+                    'error' => 'User data in field ' . $column . ' was not found'
                 ], 404);
             }
-            
+
             return response()->json([
                 'data' => $user[$column]
             ], 201);
         }
-        
+
         return response()->json([
             'data' => new UserResource($user)
         ], 201);
     }
 
-    public function update(UpdateUserRequest $request, string $id) //   PATCH/PUT | http://127.0.0.1:8000/api/users/{id}?full_name={full_name}&email={email}
+    public function update(UpdateUserRequest $request, string $id)
     {
         $data = $request->validated();
-    
+
         if (isset($data['email'])) {
             $data['email'] = strtolower($data['email']);
         }
         if (isset($data['identifier'])) {
             $data['identifier'] = strtolower($data['identifier']);
         }
-    
+
         $user = User::find($id);
-    
+
         if (!$user) {
             return response()->json(['error' => 'User with this ID does not exist'], 404);
         }
-    
+
         if (empty($data)) {
             return response()->json(['error' => 'There is no data to update.'], 400);
         }
-    
+
         $unchanged = true;
         foreach ($data as $key => $value) {
             if ($user->$key !== $value) {
@@ -87,23 +95,23 @@ class UserController extends Controller
                 break;
             }
         }
-    
+
         if ($unchanged) {
             return response()->json(['error' => 'No changes detected'], 200);
         }
-    
+
         $user->update($data);
-    
+
         return response()->json([
             'message' => 'User updated successfully',
             'data' => new UserResource($user)
         ], 200);
     }
 
-    public function destroy(string $id) //   DELETE | http://127.0.0.1:8000/api/users/{id}
+    public function destroy(string $id)
     {
         $user = User::find($id);
-        if (!$user){
+        if (!$user) {
             return response()->json([
                 'error' => 'User with this id does not exist'
             ], 404);
@@ -115,7 +123,7 @@ class UserController extends Controller
         ], 201);
     }
 
-    public function search(Request $request) //   GET | http://127.0.0.1:8000/api/users/search?column={full_name}&value={value}
+    public function search(Request $request)
     {
         $column = $request->query('column');
         $value = $request->query('value');
