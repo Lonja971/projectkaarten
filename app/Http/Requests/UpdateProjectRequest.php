@@ -34,6 +34,8 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'api_key' => 'required|string|max:255',
+
             'title' => 'string|max:255',
             'icon_id' => 'integer',
             'background_id' => 'integer',
