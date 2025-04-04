@@ -12,8 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias(['cors.restrict' => App\Http\Middleware\CorsRestrict::class]);
-        $middleware->alias(['auth.teacher' => App\Http\Middleware\TeacherMiddleware::class]);
+        $middleware->alias([
+            'auth.teacher' => App\Http\Middleware\TeacherMiddleware::class,
+            'api_key' => App\Http\Middleware\ApiKeyMiddleware::class,
+            'api_key.teacher' => App\Http\Middleware\TeacherApiKeyMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

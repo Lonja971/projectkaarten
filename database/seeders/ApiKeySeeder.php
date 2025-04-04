@@ -19,7 +19,7 @@ class ApiKeySeeder extends Seeder
         $leonid = User::where('identifier', 'leonid')->first();
 
         // API key for Kyanu
-        DB::table('api_key')->updateOrInsert(
+        DB::table('api_keys')->updateOrInsert(
             ['user_id' => $kyanu->id],
             [
                 'api_key' => Str::random(32),
@@ -29,7 +29,7 @@ class ApiKeySeeder extends Seeder
         );
 
         // API key for Leonid
-        DB::table('api_key')->updateOrInsert(
+        DB::table('api_keys')->updateOrInsert(
             ['user_id' => $leonid->id],
             [
                 'api_key' => Str::random(32),

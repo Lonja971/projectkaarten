@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('api_key', function (Blueprint $table) {
+        Schema::create('api_keys', function (Blueprint $table) {
             $table->id();
             $table->string('api_key')->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('api_key');
+        Schema::dropIfExists('api_keys');
     }
 };

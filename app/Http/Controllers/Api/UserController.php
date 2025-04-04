@@ -89,7 +89,7 @@ class UserController extends Controller
         }
     
         if ($unchanged) {
-            return response()->json(['message' => 'No changes detected'], 200);
+            return response()->json(['error' => 'No changes detected'], 200);
         }
     
         $user->update($data);
