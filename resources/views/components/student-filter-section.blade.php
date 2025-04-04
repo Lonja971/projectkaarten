@@ -1,6 +1,6 @@
 @props(['studentFilters' => ['sort' => 'name-asc', 'name' => '', 'identifier' => '']])
 
-<section class="pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex flex-col gap-[20px]">
+<section class="pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex flex-col gap-[20px]" style="min-height: calc(100vh - 68px);">
    <form id="student-filter-form" action="#navigation-buttons" method="POST" class="flex flex-col gap-[20px]" onsubmit="localStorage.setItem('showStudentsTab', 'true');">
       @csrf
    <div class="flex flex-col gap-[8px]">
@@ -42,7 +42,7 @@
       <div class="flex flex-col gap-[4px]">
          <p class="text-[#000] font-[Inter] text-[20px]">Functies</p>
          <div class="flex gap-[10px] flex-wrap">
-            <button type="submit" id="apply-student-filters" class="cursor-pointer text-[#fff] bg-[#292c64] font-bold font-[Inter] text-[16px] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] w-fit">Toepassen</button>
+            <button type="submit" id="apply-student-button" class="cursor-pointer text-[#fff] bg-[#292c64] font-bold font-[Inter] text-[16px] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] w-fit">Toepassen</button>
          </div>
       </div>
    </form>

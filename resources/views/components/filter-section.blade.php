@@ -1,6 +1,6 @@
 @props(['statuses' => [], 'schoolyears' => [], 'projectFilters' => ['sort' => 'creation-date-asc', 'name' => ''] ])
 
-<section class="pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex flex-col gap-[20px]">
+<section class="pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex flex-col gap-[20px]" style="min-height: calc(100vh - 68px);">
    <form class="flex flex-col gap-[20px]" action="#navigation-buttons" method="POST" id="filter-form" onsubmit="localStorage.setItem('studentSortDefault', 'name-asc');">
       @csrf
       <div class="flex flex-col gap-[8px]">
@@ -24,11 +24,11 @@
             </div>
             <div>
                <input type="radio" {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-asc' ? 'checked' : '' }} name="sort" id="sort-end-date-asc" value="end-date-asc" class="hidden-input" />
-               <label for="sort-end-date-asc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-asc' ? 'checked' : '' }}">Eind Datum (Eerstvolgend -> Laatste)</label>
+               <label for="sort-end-date-asc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-asc' ? 'checked' : '' }}">Einddatum (Eerstvolgend -> Laatste)</label>
             </div>
             <div>
                <input type="radio" {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-desc' ? 'checked' : '' }} name="sort" id="sort-end-date-desc" value="end-date-desc" class="hidden-input" />
-               <label for="sort-end-date-desc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-desc' ? 'checked' : '' }}">Eind Datum (Laatste -> Eerstvolgend)</label>
+               <label for="sort-end-date-desc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-desc' ? 'checked' : '' }}">Einddatum (Laatste -> Eerstvolgend)</label>
             </div>
             <div>
                <input type="radio" {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'name-asc' ? 'checked' : '' }} name="sort" id="sort-a-z" value="name-asc" class="hidden-input" />
@@ -42,9 +42,9 @@
       </div>
 
       <div class="flex flex-col gap-[8px]">
-         <p class="text-[#000] font-[Inter] text-[20px]">Naam</p>
+         <p class="text-[#000] font-[Inter] text-[20px]">Titel</p>
          <div class="flex gap-x-[10px] gap-y-[14px] flex-col mt-[-4px]">
-            <input type="text" name="name" id="project-name-filter" value="{{ $projectFilters['name'] ?? '' }}" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] w-fit" placeholder="Naam" />
+            <input type="text" name="name" id="project-name-filter" value="{{ $projectFilters['name'] ?? '' }}" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] w-fit" placeholder="Titel" />
          </div>
       </div>
 
