@@ -36,12 +36,14 @@ class ProjectController extends Controller
             $data['user_id'] = $current_user_id;
             unset($data['api_key']);
         }
+        //---Set-data-for-project---
         $data['status_id'] = env('DEFAULT_PROJECT_STATUS_ID');
         $data['project_by_student'] = User::incrementProjectIndex($current_user_id);
         $data['date_start'] = now();
 
         $new_project = Project::create($data);
 
+        //---Set-sprints---
         Sprint::setSprintsForProject($new_project->id, $new_project->date_start, $new_project->date_end);
 
         return response()->json([
@@ -55,6 +57,7 @@ class ProjectController extends Controller
     public function show(string $id)
     {
         $project = Project::with(['sprints.status', 'status'])->find($id);
+        
         if (!$project) {
             return response()->json([
                 'error' => 'Project Not Found'

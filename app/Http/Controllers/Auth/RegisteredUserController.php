@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApiKey;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 use App\Models\Role;
 
@@ -36,13 +37,14 @@ class RegisteredUserController extends Controller
 
         $request->merge([
             'email' => strtolower($request->email),
-            'identifier' => strtolower($request->identifier)
+            'identifier' => strtolower($request->identifier),
+            'password' => Str::random(12),
         ]);
 
         $rules = [
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', Rules\Password::defaults()],
             'role_id' => ['required', 'integer', 'exists:roles,id'],
             'identifier' => ['required', 'string', 'lowercase', 'unique:users,identifier'],
         ];
@@ -56,6 +58,8 @@ class RegisteredUserController extends Controller
             'email' => $validatedData['email'],
             'password' => Hash::make($request->password),
         ]);
+        
+        ApiKey::setApiKeyForUser($user->id);
 
         event(new Registered($user));
 

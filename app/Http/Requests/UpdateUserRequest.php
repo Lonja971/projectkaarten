@@ -40,7 +40,6 @@ class UpdateUserRequest extends FormRequest
             'email' => 'string|email|max:255|unique:users,email',
             'password' => '',
                 Password::defaults(),
-            'role_id' => 'integer|exists:roles,id',
             'identifier' => 'string|unique:users,identifier',
         ];
     }

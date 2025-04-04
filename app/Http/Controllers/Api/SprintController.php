@@ -47,6 +47,7 @@ class SprintController extends Controller
         $current_user_id = ApiKey::getUserId($data['api_key']);
 
         if (!User::isTeacher($current_user_id)){
+            //---is-owner---
             if (Project::getUserIdByProjectId($sprint->project_id) != $current_user_id){
                 return response()->json(['error' => 'Access is denied'], 403);
             }
