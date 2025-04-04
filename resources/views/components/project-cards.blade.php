@@ -9,7 +9,7 @@
       <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-[10px]">
          @if ($user->role && $user->role->name === "Student")
          <!-- New "Add Project" block -->
-         <div class="rounded-[25px] overflow-hidden bg-[#292c64] flex items-center justify-center cursor-pointer">
+         <div id="add-project-button" class="rounded-[25px] overflow-hidden bg-[#292c64] flex items-center justify-center cursor-pointer">
             <div class="text-white text-6xl font-bold p-[20px] flex items-center justify-center h-full w-full"><i class="fa-solid fa-plus"></i></div>
          </div>
          @endif

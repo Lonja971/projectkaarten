@@ -22,30 +22,111 @@
          
          <!-- Main content area with sidebar-content layout -->
          <div class="flex flex-row flex-grow">
-            <!-- Sidebar for filters - 18% width -->
+            @php
+               $userRole = strtolower($user->role->name);
+               $tabs = config('tabs.' . $userRole, []);
+               $currentTab = collect($tabs)->firstWhere('default', true) ?? collect($tabs)->first();
+            @endphp
+
+            <!-- Sidebar for filters - Only shown if tab has a sidebar defined -->
+            @if(isset($currentTab['sidebar']))
             <div id="sidebar" class="min-w-[330px] max-w-[330px] border-r border-[#ddd]">
-               <!-- Projects filters - visible when projects tab is active -->
-               <div id="projects-filters">
-                  <x-filter-section :statuses="$statuses ?? []" :schoolyears="$schoolyears ?? []" :projectFilters="$projectFilters ?? ['sort' => 'creation-date-asc', 'name' => '']" />
-               </div>
-               
-               <!-- Students filters - visible when students tab is active -->
-               <div id="students-filters" class="hidden">
-                  <x-student-filter-section :roles="$roles ?? []" :studentFilters="$studentFilters ?? ['sort' => 'name-asc', 'name' => '', 'identifier' => '']" />
-               </div>
+               @foreach($tabs as $tab)
+                  <div id="{{ $tab['id'] }}-filters" class="{{ !$tab['default'] ? 'hidden' : '' }}">
+                     @if(isset($tab['sidebar']) && $tab['sidebar']['component'])
+                        @php
+                           // Extract variables from configuration
+                           extract([
+                              'statuses' => $statuses ?? [],
+                              'schoolyears' => $schoolyears ?? [],
+                              'projectFilters' => $projectFilters ?? ['sort' => 'creation-date-asc', 'name' => ''],
+                              'roles' => $roles ?? [],
+                              'studentFilters' => $studentFilters ?? ['sort' => 'name-asc', 'name' => '', 'identifier' => '']
+                           ]);
+                           
+                           // Determine the component name
+                           $component = $tab['sidebar']['component'];
+                        @endphp
+                        
+                        @if(in_array($tab['id'], ['projects', 'my-projects']))
+                           <x-filter-section :statuses="$statuses" :schoolyears="$schoolyears" :projectFilters="$projectFilters" />
+                        @elseif($tab['id'] === 'students')
+                           <x-student-filter-section :roles="$roles" :studentFilters="$studentFilters" />
+                        @else
+                           <!-- Use include for all other components with standard layout -->
+                           <x-tab-filter-layout>
+                              @include('components.' . (string)$tab['sidebar']['component'])
+                           </x-tab-filter-layout>
+                        @endif
+                     @elseif(isset($tab['sidebar']) && isset($tab['sidebar']['fallback']))
+                        <!-- Fallback for tabs without a specific sidebar component -->
+                        <x-tab-filter-layout>
+                           <h3 class="font-[Inter] text-[18px] font-bold mb-4">{{ $tab['sidebar']['fallback']['title'] }}</h3>
+                           <p class="text-gray-500">{{ $tab['sidebar']['fallback']['message'] }}</p>
+                        </x-tab-filter-layout>
+                     @elseif(isset($tab['sidebar']))
+                        <!-- Default fallback only if sidebar is specified but incomplete -->
+                        <x-tab-filter-layout>
+                           <h3 class="font-[Inter] text-[18px] font-bold mb-4">{{ $tab['title'] }} filters</h3>
+                           <p class="text-gray-500">Maak een filter component voor deze tab</p>
+                        </x-tab-filter-layout>
+                     @endif
+                  </div>
+               @endforeach
             </div>
+            @endif
             
-            <!-- Main content area - 82% width -->
-            <div class="w-full">
-               <!-- Projects content - visible by default -->
-               <div id="projects-content">
-                  <x-project-cards :projects="$projects ?? []" :user="$user" />
-               </div>
-               
-               <!-- Students content - hidden by default -->
-               <div id="students-content" class="hidden">
-                  <x-student-list :users="$students ?? []" :user="$user" />
-               </div>
+            <!-- Main content area - Adjusts width based on sidebar presence -->
+            <div class="w-full" id="content-container">
+               @php
+                  $userRole = strtolower($user->role->name);
+                  $tabs = config('tabs.' . $userRole, []);
+               @endphp
+
+               @foreach($tabs as $tab)
+                  <div id="{{ $tab['id'] }}-content" class="{{ !$tab['default'] ? 'hidden' : '' }}">
+                     @if(isset($tab['content']) && $tab['content']['component'])
+                        @php
+                           // Extract variables from configuration
+                           extract([
+                              'statuses' => $statuses ?? [],
+                              'schoolyears' => $schoolyears ?? [],
+                              'projectFilters' => $projectFilters ?? ['sort' => 'creation-date-asc', 'name' => ''],
+                              'roles' => $roles ?? [],
+                              'studentFilters' => $studentFilters ?? ['sort' => 'name-asc', 'name' => '', 'identifier' => ''],
+                              'students' => $students ?? [],
+                              'projects' => $projects ?? [],
+                           ]);
+                        @endphp
+                        
+                        @if(in_array($tab['id'], ['projects', 'my-projects']))
+                           <x-project-cards :projects="$projects" :user="$user" />
+                        @elseif($tab['id'] === 'students')
+                           <x-student-list :users="$students" :user="$user" />
+                        @else
+                           <!-- Use include for all other components with standard layout -->
+                           <x-tab-content-layout>
+                              @include('components.' . (string)$tab['content']['component'])
+                           </x-tab-content-layout>
+                        @endif
+                     @elseif(isset($tab['content']) && isset($tab['content']['fallback']))
+                        <!-- Fallback for tabs without a specific content component -->
+                        <x-tab-content-layout>
+                           <div class="flex justify-center items-center min-h-[60vh] flex-col">
+                              <p class="font-[Inter] text-[20px] text-[#000]">{{ $tab['content']['fallback']['message'] }}</p>
+                           </div>
+                        </x-tab-content-layout>
+                     @else
+                        <!-- Default fallback -->
+                        <x-tab-content-layout>
+                           <div class="flex justify-center items-center min-h-[60vh] flex-col">
+                              <p class="font-[Inter] text-[20px] text-[#000]">Content voor "{{ $tab['title'] }}" tab</p>
+                              <p class="text-gray-500">Maak een component of view voor deze tab</p>
+                           </div>
+                        </x-tab-content-layout>
+                     @endif
+                  </div>
+               @endforeach
             </div>
          </div>
       @else
@@ -61,5 +142,42 @@
       <script src="{{ asset('js/navigation.js') }}"></script>
       <script src="{{ asset('js/student-filter.js') }}"></script>
       <script src="{{ asset('js/auto-switch-tab.js') }}"></script>
+      @if ($user)
+      <script>
+         // Simple script to handle tab switching and sidebar visibility
+         document.addEventListener('DOMContentLoaded', function() {
+            // Get all navigation buttons
+            var buttons = document.querySelectorAll('.nav-toggle-button');
+            var sidebar = document.getElementById('sidebar');
+            
+            // Create a map of tab IDs to sidebar status
+            var hasSidebar = {
+            @foreach($tabs as $tab)
+               '{{ $tab['id'] }}': {{ isset($tab['sidebar']) ? 'true' : 'false' }},
+            @endforeach
+            };
+            
+            // Function to update sidebar visibility
+            function updateSidebar(tabId) {
+               if (!sidebar) return;
+               
+               // Show/hide sidebar based on tab configuration
+               if (hasSidebar[tabId]) {
+                  sidebar.style.display = '';
+               } else {
+                  sidebar.style.display = 'none';
+               }
+            }
+            
+            // Set up click handlers for navigation buttons
+            buttons.forEach(function(button) {
+               button.addEventListener('click', function() {
+                  var tabId = this.getAttribute('data-tab-id');
+                  updateSidebar(tabId);
+               });
+            });
+         });
+      </script>
+      @endif
    </body>
 </html>
