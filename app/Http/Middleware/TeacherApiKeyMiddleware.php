@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\ApiResponse;
 use App\Models\ApiKey;
 use App\Models\User;
 use Closure;
@@ -15,16 +16,16 @@ class TeacherApiKeyMiddleware
         $api_key = $request->header('api_key') ?? $request->query('api_key');
 
         if (!$api_key) {
-            return response()->json(['error' => 'Missing API Key'], 401);
+            return ApiResponse::accessDenied();
         }
 
         $api_entry = ApiKey::where('api_key', $api_key)->first();
         if (!$api_entry) {
-            return response()->json(['error' => 'Invalid API Key'], 401);
+            return ApiResponse::accessDenied();
         }
         
         if (!User::isTeacher($api_entry->user_id)){
-            return response()->json(['error' => 'Access is denied'], 403);
+            return ApiResponse::accessDenied();
         }
 
         return $next($request);

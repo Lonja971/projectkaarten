@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateSprintRequest;
 use App\Http\Resources\SprintResource;
@@ -19,13 +20,11 @@ class SprintController extends Controller
     {
         $sprint = Sprint::with(['status'])->find($id);
         if (!$sprint){
-            return response()->json([
-                'error' => 'Sprint Not Found'
-            ], 404);
+            return ApiResponse::notFound();
         }
-        return response()->json([
-            'data' => new SprintResource($sprint)
-        ], 201);
+        return ApiResponse::successWithoutMessage(
+            new SprintResource($sprint)
+        );
     }
 
     /**
@@ -37,11 +36,11 @@ class SprintController extends Controller
         $sprint = Sprint::find($id);
 
         if (!$data){
-            return response()->json(['error' => 'There is no data to update.'], 400);
+            return ApiResponse::noDataToUpdate();
         }
 
         if (!$sprint){
-            return response()->json(['error' => 'Sprint with this ID does not exist'], 404);
+            return ApiResponse::notFound();
         }
 
         $current_user_id = ApiKey::getUserId($data['api_key']);
@@ -49,7 +48,7 @@ class SprintController extends Controller
         if (!User::isTeacher($current_user_id)){
             //---is-owner---
             if (Project::getUserIdByProjectId($sprint->project_id) != $current_user_id){
-                return response()->json(['error' => 'Access is denied'], 403);
+                return ApiResponse::accessDenied();
             }
 
             unset($data['feedback']);
@@ -65,14 +64,14 @@ class SprintController extends Controller
         }
 
         if ($unchanged) {
-            return response()->json(['error' => 'No changes detected'], 200);
+            return ApiResponse::noChangesDetected();
         }
 
         $sprint->update($data);
 
-        return response()->json([
-            'message' => 'Sprint updated successfully',
-            'data' => new SprintResource($sprint)
-        ], 200);
+        return ApiResponse::successWithMessage(
+            'Sprint updated successfully',
+            new SprintResource($sprint)
+        );
     }
 }

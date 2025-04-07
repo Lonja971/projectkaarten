@@ -20,6 +20,7 @@ class UpdateProjectRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
+                'status' => 'error',
                 'message' => 'Update failed',
                 'errors' => $validator->errors()
             ], 422)

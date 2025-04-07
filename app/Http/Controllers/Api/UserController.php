@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Controllers\Controller;
@@ -34,9 +35,10 @@ class UserController extends Controller
         $user = new UserResource(User::create($data));
         $api_key = ApiKey::setApiKeyForUser($user->id);
 
-        return response()->json([
-            'data' => array_merge($user->toArray(request()), ['api_key' => $api_key->api_key]),
-        ], 201);
+        return ApiResponse::successWithMessage(
+            'User has been successfully created',
+            array_merge($user->toArray(request()), ['api_key' => $api_key->api_key]),
+        );
     }
 
     public function show(Request $request, string $id)
@@ -45,21 +47,20 @@ class UserController extends Controller
         $user = User::find($id);
 
         if (!$user) {
-            return response()->json([
-                'error' => 'User Not Found'
-            ], 404);
+            return ApiResponse::notFound();
         }
 
         if ($column) {
             if (!$user[$column]) {
-                return response()->json([
-                    'error' => 'User data in field ' . $column . ' was not found'
-                ], 404);
+                return ApiResponse::notFound();
             }
 
             return response()->json([
                 'data' => $user[$column]
             ], 201);
+            return ApiResponse::successWithoutMessage(
+                $user[$column]
+            );
         }
 
         return response()->json([
@@ -81,11 +82,11 @@ class UserController extends Controller
         $user = User::find($id);
 
         if (!$user) {
-            return response()->json(['error' => 'User with this ID does not exist'], 404);
+            return ApiResponse::notFound();
         }
 
         if (empty($data)) {
-            return response()->json(['error' => 'There is no data to update.'], 400);
+            return ApiResponse::noDataToUpdate();
         }
 
         $unchanged = true;
@@ -97,30 +98,28 @@ class UserController extends Controller
         }
 
         if ($unchanged) {
-            return response()->json(['error' => 'No changes detected'], 200);
+            return ApiResponse::noChangesDetected();
         }
 
         $user->update($data);
 
-        return response()->json([
-            'message' => 'User updated successfully',
-            'data' => new UserResource($user)
-        ], 200);
+        return ApiResponse::successWithMessage(
+            'User updated successfully',
+            new UserResource($user)
+        );
     }
 
     public function destroy(string $id)
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json([
-                'error' => 'User with this id does not exist'
-            ], 404);
+            return ApiResponse::notFound();
         }
         $user->delete();
 
-        return response()->json([
-            'data' => true
-        ], 201);
+        return ApiResponse::successWithMessage(
+            'User successfully deleted'
+        );
     }
 
     public function search(Request $request)
@@ -136,7 +135,7 @@ class UserController extends Controller
             if (!$value) {
                 $missingParams[] = 'value';
             }
-            return response()->json(['error' => 'Missing search parameters (' . implode(', ', $missingParams) . ')'], 400);
+            return ApiResponse::errorWithMessage('Missing search parameters ('. implode(', ', $missingParams) . ')', null, 400);
         }
 
         $users = User::where($column, 'LIKE', "%$value%")->get();
@@ -147,17 +146,11 @@ class UserController extends Controller
         };
 
         if ($users_id) {
-            return response()->json([
-                'data' => $users_id
-            ], 201);
+            return ApiResponse::successWithoutMessage(
+                $users_id
+            );
         } else {
-            return response()->json([
-                'error' => 'Not found',
-                'data' => [
-                    'column' => $column,
-                    'value' => $value,
-                ]
-            ], 404);
+            return ApiResponse::notFound();
         }
     }
 }

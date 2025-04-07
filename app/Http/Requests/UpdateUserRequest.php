@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Response;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -22,6 +23,7 @@ class UpdateUserRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
+                'status' => 'error',
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422)
@@ -39,7 +41,7 @@ class UpdateUserRequest extends FormRequest
             'full_name' => 'string|max:255',
             'email' => 'string|email|max:255|unique:users,email',
             'password' => '',
-                Password::defaults(),
+            Password::defaults(),
             'identifier' => 'string|unique:users,identifier',
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
@@ -37,18 +38,15 @@ class ProjectController extends Controller
             unset($data['api_key']);
         }
         //---Set-data-for-project---
-        $data['status_id'] = env('DEFAULT_PROJECT_STATUS_ID');
         $data['project_by_student'] = User::incrementProjectIndex($current_user_id);
         $data['date_start'] = now();
 
         $new_project = Project::create($data);
 
-        //---Set-sprints---
-        Sprint::setSprintsForProject($new_project->id, $new_project->date_start, $new_project->date_end);
-
-        return response()->json([
-            'data' => new ProjectResource($new_project)
-        ]);
+        return ApiResponse::successWithMessage(
+            'Project has been successfully created',
+            new ProjectResource($new_project)
+        );
     }
 
     /**
@@ -59,13 +57,11 @@ class ProjectController extends Controller
         $project = Project::with(['sprints.status', 'status'])->find($id);
         
         if (!$project) {
-            return response()->json([
-                'error' => 'Project Not Found'
-            ], 404);
+            return ApiResponse::notFound();
         }
-        return response()->json([
-            'data' => new ProjectResource($project)
-        ], 201);
+        return ApiResponse::successWithoutMessage(
+            new ProjectResource($project)
+        );
     }
 
     /**
@@ -87,7 +83,7 @@ class ProjectController extends Controller
         $isOwner = Project::getUserIdByProjectId($project->id) == $current_user_id;
         
         if (!$isTeacher && !$isOwner) {
-            return response()->json(['error' => 'Access is denied'], 403);
+            return ApiResponse::accessDenied();
         }
         
         if (!$isTeacher) {
@@ -95,11 +91,11 @@ class ProjectController extends Controller
         }
 
         if (!$project) {
-            return response()->json(['error' => 'Project with this ID does not exist'], 404);
+            return ApiResponse::notFound();
         }
 
         if (empty($data)) {
-            return response()->json(['error' => 'There is no data to update.'], 400);
+            return ApiResponse::noDataToUpdate();
         }
         unset($data['api_key']);
 
@@ -112,15 +108,15 @@ class ProjectController extends Controller
         }
 
         if ($unchanged) {
-            return response()->json(['error' => 'No changes detected'], 200);
+            return ApiResponse::noChangesDetected();
         }
 
         $project->update($data);
 
-        return response()->json([
-            'message' => 'User updated successfully',
-            'data' => new ProjectResource($project)
-        ], 200);
+        return ApiResponse::successWithMessage(
+            'Project updated successfully',
+            new ProjectResource($project)
+        );
     }
 
     /**
@@ -130,14 +126,12 @@ class ProjectController extends Controller
     {
         $project = Project::find($id);
         if (!$project) {
-            return response()->json([
-                'error' => 'Project with this id does not exist'
-            ], 404);
+            return ApiResponse::notFound();
         }
         $project->delete($id);
 
-        return response()->json([
-            'data' => true
-        ]);
+        return ApiResponse::successWithMessage(
+            'Project successfully deleted'
+        );
     }
 }
