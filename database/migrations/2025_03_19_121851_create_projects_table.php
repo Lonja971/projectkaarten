@@ -22,17 +22,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
-            $table->timestamp('date_start')->nullable();
-            $table->timestamp('date_end')->nullable();
+            $table->timestamp('date_start');
+            $table->timestamp('date_end');
             $table->string('reflection')->nullable();
             $table->integer('rating')->nullable();
             $table->string('feedback')->nullable();
             $table->string('denial_reason')->nullable();
-            $table->foreignId('status_id')->constrained('project_statuses')->onDelete('cascade')->default(env('DEFAULT_PROJECT_STATUS_ID'));
-            $table->timestamps();
-            $table->string('icon_id')->nullable();
-            $table->string('background_id')->nullable();
+            $table->foreignId('status_id')->default(env('DEFAULT_PROJECT_STATUS_ID'))->constrained('project_statuses')->onDelete('cascade');
+            $table->integer('icon_id')->default(env('DEFAULT_PROJECT_ICON_ID'));
+            $table->integer('background_id')->default(env('DEFAULT_PROJECT_BACKGROUND_ID'));
             $table->integer('project_by_student');
+            $table->timestamps();
         });
 
         Schema::create('icons', function (Blueprint $table) {

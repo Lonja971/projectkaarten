@@ -20,6 +20,7 @@ class StoreProjectRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
+                'status' => 'error',
                 'message' => 'Store failed',
                 'errors' => $validator->errors()
             ], 422)

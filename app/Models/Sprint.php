@@ -12,7 +12,12 @@ class Sprint extends Model
     
     protected $guarded = [];
 
-    protected $fillable = [];
+    protected $fillable = [
+        'title',
+        'date_end',
+        'icon_id',
+        'background_id'
+    ];
 
     public function status()
     {

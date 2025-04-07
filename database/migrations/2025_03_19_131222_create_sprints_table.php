@@ -20,9 +20,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->integer('week_nr');
+            $table->timestamp('date_start');
+            $table->timestamp('date_end');
             $table->string('reflection')->nullable();
             $table->string('feedback')->nullable();
-            $table->foreignId('status_id')->constrained('sprint_statuses')->onDelete('cascade');
+            $table->foreignId('status_id')->default(1)->constrained('sprint_statuses')->onDelete('cascade');
             $table->timestamps();
         });
 
