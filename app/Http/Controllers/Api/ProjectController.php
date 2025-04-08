@@ -69,7 +69,7 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, string $id)
     {
-        $teacherFields = [
+        $teacher_fields = [
             'reflection',
             'raiting',
             'feedback',
@@ -87,7 +87,7 @@ class ProjectController extends Controller
         }
         
         if (!$isTeacher) {
-            $data = array_diff_key($data, array_flip($teacherFields));
+            $data = array_diff_key($data, array_flip($teacher_fields));
         }
 
         if (!$project) {

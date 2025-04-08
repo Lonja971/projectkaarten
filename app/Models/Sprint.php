@@ -12,11 +12,19 @@ class Sprint extends Model
     
     protected $guarded = [];
 
+    protected $attributes = [
+        'status_id' => 1,
+    ];
+
+    protected $casts = [
+        'project_id' => 'integer',
+    ];
+
     protected $fillable = [
-        'title',
-        'date_end',
-        'icon_id',
-        'background_id'
+        'week_nr',
+        'project_id',
+        'date_start',
+        'date_end'
     ];
 
     public function status()
@@ -45,5 +53,19 @@ class Sprint extends Model
         }
 
         return true;
+    }
+
+    public static function isDateAvailableForProject($project_id, $date_start, $date_end)
+    {
+        return Sprint::where('project_id', $project_id)
+            ->where(function ($query) use ($date_start, $date_end) {
+                $query->whereBetween('date_start', [$date_start, $date_end])
+                      ->orWhereBetween('date_end', [$date_start, $date_end])
+                      ->orWhere(function ($q) use ($date_start, $date_end) {
+                          $q->where('date_start', '<=', $date_start)
+                            ->where('date_end', '>=', $date_end);
+                      });
+            })
+            ->exists();
     }
 }

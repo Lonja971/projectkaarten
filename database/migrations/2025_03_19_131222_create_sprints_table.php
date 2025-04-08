@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('sprint_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('color')->nullable();
+            $table->boolean('filled')->nullable();
         });
 
         Schema::create('sprints', function (Blueprint $table) {
@@ -24,7 +26,7 @@ return new class extends Migration
             $table->timestamp('date_end');
             $table->string('reflection')->nullable();
             $table->string('feedback')->nullable();
-            $table->foreignId('status_id')->default(1)->constrained('sprint_statuses')->onDelete('cascade');
+            $table->foreignId('status_id')->default(env('DEFAULT_SPRINT_STATUS_ID'))->constrained('sprint_statuses')->onDelete('cascade');
             $table->timestamps();
         });
 
