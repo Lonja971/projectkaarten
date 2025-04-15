@@ -44,6 +44,6 @@ Route::get('{user_identifier}/{project_by_user_identifier?}', [ProjectController
 //---SPRINTS---
 
 use App\Http\Controllers\SprintController;
-Route::get('{user_identifier}/{project_by_user_identifier}/{sprint_nr?}', [SprintController::class, 'show'])
+Route::get('{user_identifier}/{project_by_user_identifier}/{sprint_week_nr?}', [SprintController::class, 'show'])
     ->name('sprints.show')
     ->middleware(['auth', 'verified']);

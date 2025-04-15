@@ -21,7 +21,7 @@ class Sprint extends Model
     ];
 
     protected $fillable = [
-        'sprint_nr',
+        'week_nr',
         'project_id',
         'date_start',
         'date_end'
@@ -37,11 +37,22 @@ class Sprint extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public static function getNewSprintNr($project_id)
+    public static function setSprintsForProject($project_id, $date_start, $date_end)
     {
-        $last_sprint = Sprint::where('project_id', $project_id)->latest('id')->first();
-        
-        return $last_sprint ? $last_sprint->sprint_nr + 1 : 1;
+        $start = Carbon::parse($date_start)->startOfDay();
+        $end = Carbon::parse($date_end)->endOfDay();
+
+        $weeks = $start->diffInWeeks($end) + 1;
+
+        for ($week = 1; $week <= $weeks; $week++) {
+            Sprint::create([
+                'project_id' => $project_id,
+                'week_nr' => $week,
+                'status_id' => env('DEFAULT_SPRINT_STATUS_ID'),
+            ]);
+        }
+
+        return true;
     }
 
     public static function isDateAvailableForProject($project_id, $date_start, $date_end)

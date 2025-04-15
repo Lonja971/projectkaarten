@@ -17,9 +17,7 @@ class SprintResource extends JsonResource
         return [
             'id' => $this->id,
             'project_id' => $this->project_id,
-            'sprint_nr' => $this->sprint_nr,
-            'date_start' => $this->date_start,
-            'date_end' => $this->date_end,
+            'week_nr' => $this->week_nr,
             'reflection' => $this->reflection,
             'feedback' => $this->feedback,
             'status' => new SprintStatusResource($this->status),

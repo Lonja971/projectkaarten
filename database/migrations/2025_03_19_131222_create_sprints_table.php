@@ -21,9 +21,9 @@ return new class extends Migration
         Schema::create('sprints', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
-            $table->integer('sprint_nr');
-            $table->date('date_start');
-            $table->date('date_end');
+            $table->integer('week_nr');
+            $table->timestamp('date_start');
+            $table->timestamp('date_end');
             $table->string('reflection')->nullable();
             $table->string('feedback')->nullable();
             $table->foreignId('status_id')->default(env('DEFAULT_SPRINT_STATUS_ID'))->constrained('sprint_statuses')->onDelete('cascade');
