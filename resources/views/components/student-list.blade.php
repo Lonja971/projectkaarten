@@ -8,6 +8,7 @@
                     <div class="flex flex-col">
                         <p class="text-[#000] font-[Inter] text-[16px] font-bold">{{ $student->full_name }}</p>
                         <p class="text-[#000] font-[Inter] text-[16px]">{{ $student->identifier}}</p>
+                        <p class="text-[#000] font-[Inter] text-[16px]">Aantal actieve projecten: {{ $student->projects->filter(function($project) { return $project->status->name === 'Actief'; })->count() }}</p>
                         <p class="text-[#000] font-[Inter] text-[16px]">Aantal projecten: {{ $student->projects->count() }}</p>
                     </div>
                     <a href="{{ route('users.index', $student->identifier) }}" class="text-[#292c64] font-bold font-[Inter] text-[16px]"><i class="fa-solid fa-arrow-right"></i></a>

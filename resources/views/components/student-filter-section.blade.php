@@ -22,6 +22,14 @@
                <input type="radio" {{ isset($studentFilters['sort']) && $studentFilters['sort'] === 'projects-asc' ? 'checked' : '' }} name="sort" id="amount-of-projects-asc" value="projects-asc" class="hidden-input" />
                <label for="amount-of-projects-asc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($studentFilters['sort']) && $studentFilters['sort'] === 'projects-asc' ? 'checked' : '' }}">Aantal projecten (Oplopend)</label>
             </div>
+            <div>
+               <input type="radio" {{ isset($studentFilters['sort']) && $studentFilters['sort'] === 'active-projects-desc' ? 'checked' : '' }} name="sort" id="amount-of-active-projects-desc" value="active-projects-desc" class="hidden-input" />
+               <label for="amount-of-active-projects-desc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($studentFilters['sort']) && $studentFilters['sort'] === 'active-projects-desc' ? 'checked' : '' }}">Aantal actieve projecten (Aflopend)</label>
+            </div>
+            <div>
+               <input type="radio" {{ isset($studentFilters['sort']) && $studentFilters['sort'] === 'active-projects-asc' ? 'checked' : '' }} name="sort" id="amount-of-active-projects-asc" value="active-projects-asc" class="hidden-input" />
+               <label for="amount-of-active-projects-asc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($studentFilters['sort']) && $studentFilters['sort'] === 'active-projects-asc' ? 'checked' : '' }}">Aantal actieve projecten (Oplopend)</label>
+            </div>
          </div>
       </div>
 

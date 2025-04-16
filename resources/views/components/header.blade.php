@@ -3,7 +3,7 @@
 <header class="flex justify-between items-center min-h-[100px] pl-[20px] pr-[20px] relative z-20">
     <div class="flex justify-start items-center gap-[20px]">
         <img src="https://ict-flex.nl/wp-content/uploads/2023/08/ICT-Flex-v2.png" alt="ICT Flex" class="h-[60px]"></img>
-        <h1 class="text-[48px] font-bold font-[Inter] text-[#fff]">Mijn SD-Flex
+        <h1 class="text-[48px] font-bold font-[Inter] text-[#fff]">Projectkaarten
             @if ($user && $user->role && $user->role->name === "Docent")
                  | Docent
             @elseif ($user && $user->role && $user->role->name === "Student")
@@ -32,7 +32,7 @@
                     <button type="submit" class="text-[#fff] hover:underline hover:cursor-pointer font-[Inter] text-[20px]">Logout</button>
                 </form>
             @else
-                <button onclick="window.location='{{ route('login') }}'" class="text-[#fff] hover:underline font-[Inter] text-[20px]">Log in</button>
+                <button onclick="window.location='{{ route('login') }}'" class="text-[#fff] hover:underline font-[Inter] text-[20px] cursor-pointer">Log in</button>
             @endauth
         @endif
     </div>
@@ -41,5 +41,18 @@
 <section class="min-h-[480px] pt-[160px] mt-[-160px] relative flex items-center pl-[20px] pr-[20px]">
     <div class="absolute inset-0 bg-[url('https://ict-flex.nl/wp-content/uploads/2023/10/deltion3large.webp')] bg-cover bg-center bg-no-repeat"></div>
     <div class="absolute inset-0 bg-black opacity-60"></div>
-    <span class="text-[48px] font-bold font-[Inter] text-[#fff] relative z-10">Overzicht</span>
+    @php
+        // Dynamically determine page title based on current route
+        $pageTitle = 'Overzicht';
+        if (request()->routeIs('help')) {
+            $pageTitle = 'Help';
+        } elseif (request()->routeIs('login')) {
+            $pageTitle = 'Login';
+        } elseif (request()->routeIs('register')) {
+            $pageTitle = 'Register';
+        } elseif (isset($title)) {
+            $pageTitle = $title;
+        }
+    @endphp
+    <span class="text-[48px] font-bold font-[Inter] text-[#fff] relative z-10">{{ $pageTitle }}</span>
 </section>

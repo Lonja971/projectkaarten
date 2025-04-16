@@ -3,10 +3,20 @@
 return [
     'docent' => [
         [
+            'id' => 'overzicht',
+            'title' => 'Eerstvolgend',
+            'icon' => 'fa-solid fa-calendar',
+            'default' => true,
+            'content' => [
+                'component' => 'overzicht',
+                'props' => []
+            ]
+        ],
+        [
             'id' => 'projects',
             'title' => 'Alle Projectkaarten',
-            'icon' => 'fa-regular fa-file',
-            'default' => true,
+            'icon' => 'fa-solid fa-file',
+            'default' => false,
             'sidebar' => [
                 'component' => 'filter-section',
                 'props' => [
@@ -24,9 +34,30 @@ return [
             ]
         ],
         [
+            'id' => 'sprints',
+            'title' => 'Alle Sprints',
+            'icon' => 'fa-solid fa-clock',
+            'default' => false,
+            'sidebar' => [
+                'component' => 'sprint-filter-section',
+                'props' => [
+                    'statuses' => '$statuses ?? []',
+                    'schoolyears' => '$schoolyears ?? []',
+                    'sprintFilters' => '$sprintFilters ?? ["sort" => "creation-date-asc", "name" => ""]'
+                ]
+            ],
+            'content' => [
+                'component' => 'sprint-cards',
+                'props' => [
+                    'sprints' => '$sprints ?? []',
+                    'user' => '$user'
+                ]
+            ]
+        ],
+        [
             'id' => 'students',
             'title' => 'Studenten',
-            'icon' => 'fa-regular fa-user',
+            'icon' => 'fa-solid fa-graduation-cap',
             'default' => false,
             'sidebar' => [
                 'component' => 'student-filter-section',
@@ -48,7 +79,7 @@ return [
         [
             'id' => 'my-projects',
             'title' => 'Mijn Projectkaarten',
-            'icon' => 'fa-regular fa-file',
+            'icon' => 'fa-solid fa-file',
             'default' => true,
             'sidebar' => [
                 'component' => 'filter-section',
@@ -63,20 +94,6 @@ return [
                 'props' => [
                     'projects' => '$projects ?? []',
                     'user' => '$user'
-                ]
-            ]
-        ],
-        [
-            'id' => 'my-attendance',
-            'title' => 'Mijn Aanwezigheid',
-            'icon' => 'fa-regular fa-id-badge',
-            'default' => false,
-            'content' => [
-                'component' => 'attendance',
-                'props' => [],
-                'fallback' => [
-                    'title' => 'Aanwezigheid',
-                    'message' => 'Aanwezigheid informatie komt hier'
                 ]
             ]
         ],

@@ -258,7 +258,12 @@ class HomeController extends Controller
                 $projects = $projectsQuery->get();
                 
                 // Fetch all students for the students section
-                $studentsQuery = User::withCount('projects')
+                $studentsQuery = User::withCount(['projects', 
+                    'projects as active_projects_count' => function($query) {
+                        $query->whereHas('status', function($statusQuery) {
+                            $statusQuery->where('name', 'Actief');
+                        });
+                    }])
                     ->whereHas('role', function($query) {
                         $query->where('name', 'Student');
                     })
@@ -287,6 +292,12 @@ class HomeController extends Controller
                         break;
                     case 'projects-asc':
                         $studentsQuery->orderBy('projects_count', 'asc');
+                        break;
+                    case 'active-projects-desc':
+                        $studentsQuery->orderBy('active_projects_count', 'desc');
+                        break;
+                    case 'active-projects-asc':
+                        $studentsQuery->orderBy('active_projects_count', 'asc');
                         break;
                     default:
                         $studentsQuery->orderBy('full_name', 'asc');
