@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('sprint_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('color')->nullable();
+            $table->boolean('filled')->nullable();
         });
 
         Schema::create('sprints', function (Blueprint $table) {
@@ -26,18 +28,18 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('sprint_goals', function (Blueprint $table) {
+        Schema::create('sprint_goals_and_retrospectives', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sprint_id')->constrained('sprints')->onDelete('cascade');
             $table->string('description');
+            $table->boolean('is_retrospective')->default(false);
             $table->timestamps();
         });
-
+        
         Schema::create('sprint_workprocesses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sprint_goal_id')->constrained('sprint_goals')->onDelete('cascade');
+            $table->foreignId('sprint_goal_id')->constrained('sprint_goals_and_retrospectives')->onDelete('cascade');
             $table->foreignId('workprocess_id')->constrained('workprocesses')->onDelete('cascade');
-            $table->timestamps();
         });
     }
     
@@ -47,7 +49,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('sprint_workprocesses');
-        Schema::dropIfExists('sprint_goals');
+        Schema::dropIfExists('sprint_goals_and_retrospectives');
         Schema::dropIfExists('sprints');
         Schema::dropIfExists('sprint_statuses');
     }

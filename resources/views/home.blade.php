@@ -1,7 +1,7 @@
 @props(['user' => Auth::user()])
 
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="nl" class="h-full">
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,8 +28,13 @@
                $currentTab = collect($tabs)->firstWhere('default', true) ?? collect($tabs)->first();
             @endphp
 
-            <!-- Sidebar for filters - Only shown if tab has a sidebar defined -->
-            @if(isset($currentTab['sidebar']))
+            <!-- Sidebar for filters - Only shown if any tab has a sidebar defined -->
+            @php
+                $anySidebarExists = collect($tabs)->contains(function ($tab) {
+                    return isset($tab['sidebar']);
+                });
+            @endphp
+            @if($anySidebarExists)
             <div id="sidebar" class="min-w-[330px] max-w-[330px] border-r border-[#ddd]">
                @foreach($tabs as $tab)
                   <div id="{{ $tab['id'] }}-filters" class="{{ !$tab['default'] ? 'hidden' : '' }}">
@@ -161,10 +166,22 @@
             function updateSidebar(tabId) {
                if (!sidebar) return;
                
-               // Show/hide sidebar based on tab configuration
+               // Show sidebar if current tab has a sidebar configuration
                if (hasSidebar[tabId]) {
                   sidebar.style.display = '';
+                  
+                  // Hide all filter sections first
+                  document.querySelectorAll('[id$="-filters"]').forEach(function(filterSection) {
+                     filterSection.classList.add('hidden');
+                  });
+                  
+                  // Show only the filter section for current tab
+                  var currentFilterSection = document.getElementById(tabId + '-filters');
+                  if (currentFilterSection) {
+                     currentFilterSection.classList.remove('hidden');
+                  }
                } else {
+                  // Hide sidebar if current tab has no sidebar
                   sidebar.style.display = 'none';
                }
             }
