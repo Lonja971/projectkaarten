@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             BackgroundSeeder::class,
             ProjectSeeder::class,
             ApiKeySeeder::class,
+            SprintStatusSeeder::class,
         ]);
     }
 }

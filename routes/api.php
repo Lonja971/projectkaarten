@@ -13,20 +13,20 @@ use App\Http\Controllers\Api\SprintController;
 
 Route::get('/users/search', [UserController::class, 'search']);
 
-Route::middleware('api_key.teacher')
+Route::middleware('api_key.teacher', 'throttle:cooldown-api')
     ->apiResource('/users', UserController::class);
 
 //---PROJECTS---
 
-Route::middleware('api_key')
+Route::middleware('api_key', 'throttle:cooldown-api')
     ->apiResource('/projects', ProjectController::class)
     ->only('show', 'store', 'update');
 
-Route::middleware('api_key.teacher')
+Route::middleware('api_key.teacher', 'throttle:cooldown-api')
     ->apiResource('/projects', ProjectController::class)
     ->except('show', 'store', 'update');
 
 //---SPRINTS---
 
-Route::middleware('api_key')
+Route::middleware('api_key', 'throttle:cooldown-api')
     ->apiResource('/sprints', SprintController::class);

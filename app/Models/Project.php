@@ -15,6 +15,12 @@ class Project extends Model
     use HasFactory;
     
     protected $guarded = [];
+
+    protected $attributes = [
+        'status_id' => 1,
+        'icon_id' => 1,
+        'background_id' => 38,
+    ];
     
     public function status()
     {
