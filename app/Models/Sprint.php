@@ -21,10 +21,12 @@ class Sprint extends Model
     ];
 
     protected $fillable = [
-        'week_nr',
+        'sprint_nr',
         'project_id',
         'date_start',
-        'date_end'
+        'date_end',
+        'reflection',
+        'feedback'
     ];
 
     public function status()
@@ -67,5 +69,10 @@ class Sprint extends Model
                       });
             })
             ->exists();
+    }
+
+    public static function getLastSprintNumberForProject(int $project_id): ?int
+    {
+        return Sprint::where('project_id', $project_id)->max('sprint_nr');
     }
 }

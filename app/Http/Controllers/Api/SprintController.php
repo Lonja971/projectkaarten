@@ -59,7 +59,7 @@ class SprintController extends Controller
         
         //---Set-data-for-project---
         unset($data['api_key']);
-        $data['week_nr'] = 1;
+        $data['sprint_nr'] = Sprint::getLastSprintNumberForProject($data['project_id']) + 1;
 
         $new_sprint = Sprint::create($data);
 

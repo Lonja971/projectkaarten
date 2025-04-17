@@ -329,18 +329,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Selecteer een achtergrondkleur voor uw project');
                 return;
             }
-            
-            // Here you would normally submit the form data
-            console.log('Creating project with:', {
+
+            axios.post('http://127.0.0.1:8000/api/projects', {
                 title: titleInput.value,
                 date_end: dateInput.value,
                 icon_id: iconInput.value,
-                background_id: bgInput.value
-            });
+                background_id: bgInput.value,
+                api_key: "rgttrtrgtrgtrgt",
+
+            })
+              .then(response => {
+                receivedData = response.data;
+                window.location.replace(`http://127.0.0.1:8000/${userIdentifier}/${receivedData.data.project_by_student}`);
+              })
+              .catch(error => {
+                console.error('API Error:', error.response?.data || error.message);
+              });
             
             // For now, just show confirmation and close modal
-            alert('Project wordt aangemaakt!');
-            document.body.removeChild(overlay);
         });
         
         // Cancel button
