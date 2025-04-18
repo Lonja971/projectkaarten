@@ -15,6 +15,9 @@ use App\Models\SprintGoalAndRetrospective;
 use App\Models\SprintWorkprocess;
 use App\Models\User;
 use App\Models\Workprocess;
+use App\Services\Sprint\SprintGoalService;
+use App\Services\Sprint\SprintService;
+use App\Services\Sprint\SprintWorkprocessService;
 use Illuminate\Http\Request;
 
 class SprintController extends Controller
@@ -115,137 +118,60 @@ class SprintController extends Controller
         $teacher_fields = [
             'feedback',
         ];
-        $api_key = $request['api_key'];
         $data = $request->validated();
-        $has_data =
-            !empty($data['sprint']) ||
-            !empty($data['goals']['create']) ||
-            !empty($data['goals']['update']) ||
-            !empty($data['goals']['delete']) ||
-            !empty($data['workprocesses']['create']) ||
-            !empty($data['workprocesses']['delete']);
-
+        $api_key = $request['api_key'];
+        $user_id = ApiKey::getUserId($api_key);
         $sprint = Sprint::find($id);
-
-        $current_user_id = ApiKey::getUserId($api_key);
-
-        if (!$current_user_id) {
+    
+        if (!$user_id) return ApiResponse::accessDenied();
+        if (!$sprint) return ApiResponse::notFound();
+    
+        $sprintService = app(SprintService::class);
+        $goalService = app(SprintGoalService::class);
+        $wpService = app(SprintWorkprocessService::class);
+    
+        if (!$sprintService->userCanUpdate($user_id, $sprint)) {
             return ApiResponse::accessDenied();
         }
-        if (!$sprint) {
-            return ApiResponse::notFound();
-        }
-        if (!$has_data) {
+    
+        if (
+            empty($data['sprint']) &&
+            empty($data['goals']['create']) &&
+            empty($data['goals']['update']) &&
+            empty($data['goals']['delete']) &&
+            empty($data['workprocesses']['create']) &&
+            empty($data['workprocesses']['delete'])
+        ) {
             return ApiResponse::noDataToUpdate();
         }
-
-        if (!User::isTeacher($current_user_id)) {
-            //---is-owner---
-            if (Project::getUserIdByProjectId($sprint->project_id) != $current_user_id) {
-                return ApiResponse::accessDenied();
-            }
-            if (!empty($data['sprint'])) {
-                $data['sprint'] = array_diff_key($data['sprint'], array_flip($teacher_fields));
-            }
+        
+        if (!User::isTeacher($user_id)) {
+            $data['sprint'] = array_diff_key($data['sprint'] ?? [], array_flip($teacher_fields));
         }
-
+    
         $unchanged = true;
-
-        //---Update-Sprint-info---
         if (!empty($data['sprint'])) {
-            foreach ($data['sprint'] as $key => $value) {
-                if ($sprint->$key !== $value) {
-                    $unchanged = false;
-                    break;
-                }
-            }
+            $unchanged = !$sprintService->updateSprintInfo($sprint, $data['sprint']);
         }
-
-        //---Update-sprint-goals-info---
+    
         if (!empty($data['goals'])) {
-            if (isset($data['goals']['update']) && !empty($data['goals']['update'])) {
-                foreach ($data['goals']['update'] as $goal_id => $goal_data) {
-                    $goal = SprintGoalAndRetrospective::find($goal_id);
-
-                    if (!$goal || $id != $goal->sprint_id) {
-                        continue;
-                    }
-
-                    $goal->fill($goal_data);
-                    if ($goal->isDirty) {
-                        $goal->update($goal_data);
-                        $unchanged = false;
-                    }
-                }
-            }
-            if (isset($data['goals']['delete']) && !empty($data['goals']['delete'])) {
-                foreach ($data['goals']['delete'] as $goal_id) {
-                    $goal = SprintGoalAndRetrospective::find($goal_id);
-                    if (!$goal || $id != $goal->sprint_id) {
-                        continue;
-                    }
-                    $goal->delete($goal_id);
-                    $unchanged = false;
-                }
-            }
-            if (isset($data['goals']['create']) && !empty($data['goals']['create'])) {
-                foreach ($data['goals']['create'] as $goal_data) {
-                    $goal_data['sprint_id'] = $id;
-                    SprintGoalAndRetrospective::create($goal_data);
-                    $unchanged = false;
-                }
+            if ($goalService->updateGoals($sprint, $data['goals'])) {
+                $unchanged = false;
             }
         }
-
-        //---Update-sprint-workprocesses-info---
+    
         if (!empty($data['workprocesses'])) {
-            if (isset($data['workprocesses']['delete']) && !empty($data['workprocesses']['delete'])) {
-                foreach ($data['workprocesses']['delete'] as $sprint_workprocess_id) {
-                    $sprint_workprocess = SprintWorkprocess::find($sprint_workprocess_id);
-                    if (!$sprint_workprocess) {
-                        continue;
-                    }
-                    $sprint_id = SprintGoalAndRetrospective::where('id', $sprint_workprocess->sprint_goal_id)->pluck('sprint_id')->first();
-                    if ($sprint_id != $id) {
-                        continue;
-                    }
-                    $sprint_workprocess->delete();
-                    $unchanged = false;
-                }
-            }
-            if (isset($data['workprocesses']['create']) && !empty($data['workprocesses']['create'])) {
-                foreach ($data['workprocesses']['create'] as $sprint_workprocess_data) {
-                    $sprint_id = SprintGoalAndRetrospective::where('id', $sprint_workprocess_data['sprint_goal_id'])->pluck('sprint_id')->first();
-                    $is_workprocess = Workprocess::where('id', $sprint_workprocess_data['workprocess_id'])->exists();
-
-                    if ($sprint_id != $id || !$is_workprocess) {
-                        continue;
-                    }
-                    $exists = SprintWorkprocess::where('sprint_goal_id', $sprint_workprocess_data['sprint_goal_id'])
-                        ->where('workprocess_id', $sprint_workprocess_data['workprocess_id'])
-                        ->exists();
-
-                    if ($exists) {
-                        continue;
-                    }
-
-                    $sprint_workprocess = SprintWorkprocess::create($sprint_workprocess_data);
-                    $unchanged = false;
-                }
+            if ($wpService->handle($sprint, $data['workprocesses'])) {
+                $unchanged = false;
             }
         }
-
+    
         if ($unchanged) {
             return ApiResponse::noChangesDetected();
         }
-
-        if (!empty($data['sprint'])){
-            $sprint->update($data['sprint']);
-        }
-        $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')
-            ->where('sprint_id', $sprint->id)
-            ->get();
-
+    
+        $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')->where('sprint_id', $sprint->id)->get();
+    
         return ApiResponse::successWithMessage(
             'Sprint updated successfully',
             new SprintWithGoalsResource($sprint)

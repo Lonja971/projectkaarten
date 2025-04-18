@@ -16,6 +16,9 @@ class SprintWorkprocessService
         // Delete
         foreach ($data['delete'] ?? [] as $id) {
             $wp = SprintWorkprocess::find($id);
+            if (!$wp) {
+                continue;
+            }
             $goal_sprint_id = SprintGoalAndRetrospective::where('id', $wp->sprint_goal_id)->pluck('sprint_id')->first();
 
             if ($wp && $goal_sprint_id === $sprint->id) {
