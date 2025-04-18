@@ -11,6 +11,7 @@ use App\Models\ApiKey;
 use App\Models\Project;
 use App\Models\Sprint;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
@@ -29,15 +30,15 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
+        $api_key = $request['api_key'];
         $data = $request->validated();
 
-        $current_user_id = ApiKey::getUserId($data['api_key']);
+        $current_user_id = ApiKey::getUserId($api_key);
 
         if (!$current_user_id) {
             return ApiResponse::accessDenied();
         }
         $data['user_id'] = $current_user_id;
-        unset($data['api_key']);
         
         //---Set-data-for-project---
         $data['project_by_student'] = User::incrementProjectIndex($current_user_id);
@@ -78,9 +79,10 @@ class ProjectController extends Controller
             'denial_reason',
             'status_id',
         ];
+        $api_key = $request['api_key'];
         $data = $request->validated();
         $project = Project::find($id);
-        $current_user_id = ApiKey::getUserId($data['api_key']);
+        $current_user_id = ApiKey::getUserId($api_key);
         $isTeacher = User::isTeacher($current_user_id);
         $isOwner = Project::getUserIdByProjectId($project->id) == $current_user_id;
         
@@ -99,7 +101,6 @@ class ProjectController extends Controller
         if (empty($data)) {
             return ApiResponse::noDataToUpdate();
         }
-        unset($data['api_key']);
 
         $unchanged = true;
         foreach ($data as $key => $value) {
@@ -124,12 +125,19 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        $current_user_id = ApiKey::getUserId($request->api_key);
+        $is_teacher = User::isTeacher($current_user_id);
         $project = Project::find($id);
+
         if (!$project) {
             return ApiResponse::notFound();
         }
+        if ($project->user_id != $current_user_id && !$is_teacher){
+            return ApiResponse::accessDenied();
+        }
+
         $project->delete($id);
 
         return ApiResponse::successWithMessage(

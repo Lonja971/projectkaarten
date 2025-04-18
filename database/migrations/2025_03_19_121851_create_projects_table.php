@@ -39,7 +39,6 @@ return new class extends Migration
             $table->string('feedback')->nullable();
             $table->string('denial_reason')->nullable();
             $table->foreignId('status_id')->default(env('DEFAULT_PROJECT_STATUS_ID'))->constrained('project_statuses')->onDelete('cascade');
-            $table->timestamps();
             $table->string('icon_id')->default(env('DEFAULT_PROJECT_ICON_ID'))->constrained('icons')->onDelete('cascade');
             $table->string('background_id')->default(env('DEFAULT_PROJECT_BACKGROUND_ID'))->constrained('backgrounds')->onDelete('cascade');
             $table->integer('project_by_student');
