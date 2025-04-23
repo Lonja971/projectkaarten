@@ -23,20 +23,13 @@ use Illuminate\Http\Request;
 class SprintController extends Controller
 {
     /**
-     * Display the specified resource.
+     * Display a listing of the resource.
      */
-    public function show(string $id)
+    public function index()
     {
-        $sprint = Sprint::with(['status'])->find($id);
-        if (!$sprint) {
-            return ApiResponse::notFound();
-        }
-        $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')
-            ->where('sprint_id', $sprint->id)
-            ->get();
-        return ApiResponse::successWithoutMessage(
-            new SprintWithGoalsResource($sprint)
-        );
+        return response()->json([
+            Sprint::query()->orderBy('id', 'asc')->paginate(10)
+        ]);
     }
 
     /**
@@ -49,14 +42,9 @@ class SprintController extends Controller
 
         $current_user_id = ApiKey::getUserId($api_key);
 
-        if (!$current_user_id) {
-            return ApiResponse::accessDenied();
-        }
-
-        $is_teacher = User::isTeacher($current_user_id);
-        $project_owner_id = Project::getUserIdByProjectId($data['project_id']);
-
-        if (!$is_teacher && $project_owner_id != $current_user_id) {
+        if (!$current_user_id) return ApiResponse::accessDenied();
+        
+        if (!Project::userHasAccess($current_user_id, $data['project_id'])){
             return ApiResponse::accessDenied();
         }
 
@@ -68,7 +56,7 @@ class SprintController extends Controller
             );
         }
 
-        //---Set-data-for-project---
+        //---Set-data-for-sprint---
         $data['sprint_nr'] = Sprint::getLastSprintNumberForProject($data['project_id']) + 1;
 
         $new_sprint = Sprint::create($data);
@@ -111,6 +99,24 @@ class SprintController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $sprint = Sprint::with(['status'])->find($id);
+
+        if (!$sprint) return ApiResponse::notFound();
+
+        $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')
+            ->where('sprint_id', $sprint->id)
+            ->get();
+
+        return ApiResponse::successWithoutMessage(
+            new SprintWithGoalsResource($sprint)
+        );
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateSprintRequest $request, string $id)
@@ -130,7 +136,7 @@ class SprintController extends Controller
         $goalService = app(SprintGoalService::class);
         $wpService = app(SprintWorkprocessService::class);
     
-        if (!$sprintService->userCanUpdate($user_id, $sprint)) {
+        if (!Project::userHasAccess($user_id, $sprint->project_id)) {
             return ApiResponse::accessDenied();
         }
     
@@ -185,15 +191,11 @@ class SprintController extends Controller
     {
         $sprint = Sprint::find($id);
 
-        if (!$sprint) {
-            return ApiResponse::notFound();
-        }
+        if (!$sprint) return ApiResponse::notFound();
 
         $current_user_id = ApiKey::getUserId($request->api_key);
-        $is_teacher = User::isTeacher($current_user_id);
-        $projects_user_id = Project::where('id', $sprint->project_id)->pluck('user_id')->first();
-
-        if ($projects_user_id != $current_user_id && !$is_teacher) {
+        
+        if (!Project::userHasAccess($current_user_id, $sprint->project_id)){
             return ApiResponse::accessDenied();
         }
 

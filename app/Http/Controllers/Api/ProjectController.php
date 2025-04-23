@@ -9,7 +9,6 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\ApiKey;
 use App\Models\Project;
-use App\Models\Sprint;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -86,16 +85,11 @@ class ProjectController extends Controller
         $isTeacher = User::isTeacher($current_user_id);
         $isOwner = Project::getUserIdByProjectId($project->id) == $current_user_id;
         
-        if (!$isTeacher && !$isOwner) {
-            return ApiResponse::accessDenied();
-        }
-        
+        if (!$isTeacher && !$isOwner) return ApiResponse::accessDenied();
+        if (!$project) return ApiResponse::notFound();
+
         if (!$isTeacher) {
             $data = array_diff_key($data, array_flip($teacher_fields));
-        }
-
-        if (!$project) {
-            return ApiResponse::notFound();
         }
 
         if (empty($data)) {
@@ -110,9 +104,7 @@ class ProjectController extends Controller
             }
         }
 
-        if ($unchanged) {
-            return ApiResponse::noChangesDetected();
-        }
+        if ($unchanged) return ApiResponse::noChangesDetected();
 
         $project->update($data);
 

@@ -11,7 +11,7 @@ class SprintGoalService
    {
       $changes = [];
 
-      // --- Update
+      //---Update---
       foreach ($goalsData['update'] ?? [] as $goal_id => $goal_data) {
           $goal = SprintGoalAndRetrospective::find($goal_id);
 
@@ -25,7 +25,7 @@ class SprintGoalService
           }
       }
 
-      // --- Delete
+      //---Delete---
       foreach ($goalsData['delete'] ?? [] as $goal_id) {
           $goal = SprintGoalAndRetrospective::find($goal_id);
 
@@ -35,7 +35,7 @@ class SprintGoalService
           }
       }
 
-      // --- Create
+      //---Create---
       foreach ($goalsData['create'] ?? [] as $goal_data) {
           $goal_data['sprint_id'] = $sprint->id;
           SprintGoalAndRetrospective::create($goal_data);
