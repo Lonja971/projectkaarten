@@ -140,4 +140,18 @@ class Project extends Model
     {
         return Project::where('id', $project_id)->value('user_id');
     }
+
+    /**
+     * Check if a user has access to a specific project.
+     *
+     * @param int $userId The ID of the user.
+     * @param int $projectId The ID of the project.
+     * @return bool True if the user has access, false otherwise.
+     */
+    public static function userHasAccess(int $user_id, int $project_id): bool
+    {
+        if (User::isTeacher($user_id)) return true;
+        
+        return Project::getUserIdByProjectId($project_id) === $user_id;
+    }
 }

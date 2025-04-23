@@ -147,6 +147,12 @@
       <script src="{{ asset('js/navigation.js') }}"></script>
       <script src="{{ asset('js/student-filter.js') }}"></script>
       <script src="{{ asset('js/auto-switch-tab.js') }}"></script>
+      @if ($user && $user->identifier)
+         <script>
+            let userIdentifier = @json($user->identifier);
+         </script>
+      @endif
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
       @if ($user)
       <script>
          // Simple script to handle tab switching and sidebar visibility

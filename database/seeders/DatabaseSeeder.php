@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         // Call individual seeders in the correct order
         $this->call([
             RoleSeeder::class,
+            WorkprocessesSeeder::class,
             UserSeeder::class,
             ProjectStatusSeeder::class,
             IconSeeder::class,

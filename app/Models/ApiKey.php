@@ -20,19 +20,20 @@ class ApiKey extends Model
 
     public static function setApiKeyForUser($user_id)
     {
-        $existing_api_key = self::where('user_id', $user_id)->first();
-        if ($existing_api_key) {
-            $existing_api_key->delete();
+        $api_key = self::where('user_id', $user_id)->first();
+
+        if (!$api_key){
+            $api_code = Str::random(32);
+    
+            $api_key = self::create([
+                'api_key' => $api_code,
+                'user_id' => $user_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        $api_key = Str::random(32);
-
-        return self::create([
-            'api_key' => $api_key,
-            'user_id' => $user_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        return $api_key;
     }
 
     public static function isValid($apiKey)

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SprintResource extends JsonResource
+class SprintWithGoalsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,6 +22,7 @@ class SprintResource extends JsonResource
             'feedback' => $this->feedback,
             'status' => new SprintStatusResource($this->status),
             'created_at' => $this->created_at,
+            'goals' => GoalsResource::collection($this->goals),
         ];
     }
 }

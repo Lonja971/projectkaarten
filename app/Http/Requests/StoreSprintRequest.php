@@ -35,10 +35,18 @@ class StoreSprintRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'api_key' => 'required|string',
             'project_id' => 'required|integer',
             'date_start' => 'required|date|after_or_equal:today',
             'date_end' => 'required|date|after_or_equal:date_start',
+
+            //---GOALS-ARRAY-VALIDATION---
+            'goals' => 'nullable|array',
+            'goals.*.description' => 'required|string',
+            'goals.*.is_retrospective' => 'required|boolean',
+
+            //---WORKPROCESSES-ARRAY-VALIDATION---
+            'goals.*.workprocess_ids' => 'nullable|array',
+            'goals.*.workprocess_ids.*' => 'required|integer|exists:work_processes,id',
         ];
     }
 }
