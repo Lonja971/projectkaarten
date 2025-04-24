@@ -19,9 +19,24 @@ use App\Services\Sprint\SprintGoalService;
 use App\Services\Sprint\SprintService;
 use App\Services\Sprint\SprintWorkprocessService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class SprintController extends Controller
 {
+    protected SprintService $sprintService;
+    protected SprintGoalService $goalService;
+    protected SprintWorkprocessService $workprocessService;
+
+    public function __construct(
+        SprintService $sprintService,
+        SprintGoalService $goalService,
+        SprintWorkprocessService $workprocessService
+    ) {
+        $this->sprintService = $sprintService;
+        $this->goalService = $goalService;
+        $this->workprocessService = $workprocessService;
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -63,29 +78,7 @@ class SprintController extends Controller
 
         //---Set-all-goals-and-workprocesses---
         if (isset($data['goals']) && !empty($data['goals'])) {
-            $created_goals = [];
-
-            foreach ($data['goals'] as $goal) {
-                $goal['sprint_id'] = $new_sprint->id;
-                $created_goal = SprintGoalAndRetrospective::create($goal);
-
-                if (isset($goal['workprocess_ids']) && !empty($goal['workprocess_ids'])) {
-                    $goal['workprocess_ids'] = array_unique($goal['workprocess_ids']);
-                    $all_workprocesses = [];
-
-                    foreach ($goal['workprocess_ids'] as $workprocess_id) {
-                        $is_workprocess = Workprocess::where('id', $workprocess_id)->exists();
-                        if (!$is_workprocess) {
-                            continue;
-                        }
-                        $workprocess['sprint_goal_id'] = $created_goal->id;
-                        $workprocess['workprocess_id'] = $workprocess_id;
-                        $all_workprocesses[] = SprintWorkprocess::create($workprocess);
-                    }
-                }
-                $created_goal['workprocesses'] = $all_workprocesses;
-                $created_goals[] = $created_goal;
-            }
+            $created_goals = $this->goalService->createGoalsWithWorkprocesses($new_sprint, $data['goals']);
             $new_sprint['goals'] = $created_goals;
         }
         $resource = !empty($new_sprint->goals)
@@ -124,55 +117,48 @@ class SprintController extends Controller
         $teacher_fields = [
             'feedback',
         ];
-        $data = $request->validated();
+        $sprint_fields = [
+            'reflection',
+            'feedback',
+        ];
         $api_key = $request['api_key'];
+        $data = $request->validated();
         $user_id = ApiKey::getUserId($api_key);
         $sprint = Sprint::find($id);
     
         if (!$user_id) return ApiResponse::accessDenied();
         if (!$sprint) return ApiResponse::notFound();
-    
-        $sprintService = app(SprintService::class);
-        $goalService = app(SprintGoalService::class);
-        $wpService = app(SprintWorkprocessService::class);
-    
-        if (!Project::userHasAccess($user_id, $sprint->project_id)) {
-            return ApiResponse::accessDenied();
-        }
+        if (!Project::userHasAccess($user_id, $sprint->project_id)) return ApiResponse::accessDenied();
     
         if (
-            empty($data['sprint']) &&
+            empty($data['reflection']) &&
+            empty($data['feedback']) &&
             empty($data['goals']['create']) &&
             empty($data['goals']['update']) &&
-            empty($data['goals']['delete']) &&
-            empty($data['workprocesses']['create']) &&
-            empty($data['workprocesses']['delete'])
+            empty($data['goals']['delete'])
         ) {
             return ApiResponse::noDataToUpdate();
         }
         
         if (!User::isTeacher($user_id)) {
-            $data['sprint'] = array_diff_key($data['sprint'] ?? [], array_flip($teacher_fields));
+            $data = array_diff_key($data ?? [], array_flip($teacher_fields));
         }
-    
-        $unchanged = true;
-        if (!empty($data['sprint'])) {
-            $unchanged = !$sprintService->updateSprintInfo($sprint, $data['sprint']);
+        $sprint_data = Arr::only($data, $sprint_fields);
+        $has_changes = false;
+
+        if (!empty($sprint_data)) {
+            if ($this->sprintService->updateSprintInfo($sprint, $sprint_data)) {
+                $has_changes = true;
+            }
         }
     
         if (!empty($data['goals'])) {
-            if ($goalService->updateGoals($sprint, $data['goals'])) {
-                $unchanged = false;
+            if ($this->goalService->handle($sprint, $data['goals'])) {
+                $has_changes = true;
             }
         }
     
-        if (!empty($data['workprocesses'])) {
-            if ($wpService->handle($sprint, $data['workprocesses'])) {
-                $unchanged = false;
-            }
-        }
-    
-        if ($unchanged) {
+        if (!$has_changes) {
             return ApiResponse::noChangesDetected();
         }
     
@@ -198,11 +184,7 @@ class SprintController extends Controller
         if (!Project::userHasAccess($current_user_id, $sprint->project_id)){
             return ApiResponse::accessDenied();
         }
-
-        foreach ($sprint->goals as $goal) {
-            $goal->workprocesses()->delete();
-            $goal->delete();
-        }
+        
         $sprint->delete($id);
 
         return ApiResponse::successWithMessage(

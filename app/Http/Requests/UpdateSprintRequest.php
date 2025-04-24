@@ -34,32 +34,29 @@ class UpdateSprintRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'sprint' => 'nullable|array',
-            'sprint.reflection' => 'string|max:255',
-            'sprint.feedback' => 'string|max:255',
-
+        return [    
+            'reflection' => 'string|max:255',
+            'feedback' => 'string|max:255',
             'goals' => 'nullable|array',
-            
-            'goals.update' => 'nullable|array',
-            'goals.update.*.description' => 'sometimes|required|string',
-            'goals.update.*.is_retrospective' => 'sometimes|required|boolean',
-            
-            'goals.delete' => 'nullable|array',
-            'goals.delete.*' => 'integer',
-            
+
             'goals.create' => 'nullable|array',
             'goals.create.*.description' => 'required|string',
             'goals.create.*.is_retrospective' => 'required|boolean',
+            'goals.create.*.workprocess_ids' => 'nullable|array',
+            'goals.create.*.workprocess_ids.*' => 'required|integer|exists:work_processes,id',
             
-            'workprocesses' => 'nullable|array',
-
-            'workprocesses.delete' => 'nullable|array',
-            'workprocesses.delete.*' => 'integer',
-
-            'workprocesses.create' => 'nullable|array',
-            'workprocesses.create.*.sprint_goal_id' => 'required|integer',
-            'workprocesses.create.*.workprocess_id' => 'required|integer',
+            'goals.update' => 'nullable|array',
+            'goals.update.*.id' => 'required|integer|exists:sprint_goals_and_retrospectives,id',
+            'goals.update.*.description' => 'sometimes|required|string',
+            'goals.update.*.is_retrospective' => 'sometimes|required|boolean',
+            'goals.update.*.workprocesses' => 'nullable|array',
+            'goals.update.*.workprocesses.add' => 'nullable|array',
+            'goals.update.*.workprocesses.add.*' => 'integer|exists:work_processes,id',
+            'goals.update.*.workprocesses.remove' => 'nullable|array',
+            'goals.update.*.workprocesses.remove.*' => 'integer|exists:work_processes,id',
+            
+            'goals.delete' => 'nullable|array',
+            'goals.delete.*' => 'integer',
         ];
     }
 }
