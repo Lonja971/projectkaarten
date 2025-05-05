@@ -26,9 +26,7 @@ class SprintWorkprocessService
         foreach (array_unique($workprocess_ids) as $id) {
             if (!Workprocess::where('id', $id)->exists()) continue;
 
-            $is_already_exists = SprintWorkprocess::where('sprint_goal_id', $goal_id)
-                ->where('workprocess_id', $id)
-                ->exists();
+            $is_already_exists = SprintWorkprocess::existsForGoalAndWorkprocess($goal_id, $id);
 
             if ($is_already_exists) continue;
 
