@@ -7,45 +7,59 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSprintRequest;
 use App\Http\Requests\UpdateSprintRequest;
 use App\Http\Resources\SprintResource;
+use App\Http\Resources\SprintWithGoalsResource;
 use App\Models\ApiKey;
 use App\Models\Project;
 use App\Models\Sprint;
+use App\Models\SprintGoalAndRetrospective;
+use App\Models\SprintWorkprocess;
 use App\Models\User;
+use App\Models\Workprocess;
+use App\Services\Sprint\SprintGoalService;
+use App\Services\Sprint\SprintService;
+use App\Services\Sprint\SprintWorkprocessService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class SprintController extends Controller
 {
+    protected SprintService $sprintService;
+    protected SprintGoalService $goalService;
+    protected SprintWorkprocessService $workprocessService;
+
+    public function __construct(
+        SprintService $sprintService,
+        SprintGoalService $goalService,
+        SprintWorkprocessService $workprocessService
+    ) {
+        $this->sprintService = $sprintService;
+        $this->goalService = $goalService;
+        $this->workprocessService = $workprocessService;
+    }
+    
     /**
-     * Display the specified resource.
+     * Display a listing of the resource.
      */
-    public function show(string $id)
+    public function index()
     {
-        $sprint = Sprint::with(['status'])->find($id);
-        if (!$sprint){
-            return ApiResponse::notFound();
-        }
-        return ApiResponse::successWithoutMessage(
-            new SprintResource($sprint)
-        );
+        return response()->json([
+            Sprint::query()->orderBy('id', 'asc')->paginate(10)
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
-    */
+     */
     public function store(StoreSprintRequest $request)
     {
-
+        $api_key = $request['api_key'];
         $data = $request->validated();
 
-        $current_user_id = ApiKey::getUserId($data['api_key']);
+        $current_user_id = ApiKey::getUserId($api_key);
 
-        if (!$current_user_id) {
-            return ApiResponse::accessDenied();
-        }
-
-        $is_teacher = User::isTeacher($current_user_id);
-        $project_owner_id = Project::getUserIdByProjectId($data['project_id']);
-
-        if (!$is_teacher && $project_owner_id != $current_user_id){
+        if (!$current_user_id) return ApiResponse::accessDenied();
+        
+        if (!Project::userHasAccess($current_user_id, $data['project_id'])){
             return ApiResponse::accessDenied();
         }
 
@@ -56,16 +70,42 @@ class SprintController extends Controller
                 422
             );
         }
-        
-        //---Set-data-for-project---
-        unset($data['api_key']);
-        $data['week_nr'] = 1;
+
+        //---Set-data-for-sprint---
+        $data['sprint_nr'] = Sprint::getLastSprintNumberForProject($data['project_id']) + 1;
 
         $new_sprint = Sprint::create($data);
 
+        //---Set-all-goals-and-workprocesses---
+        if (isset($data['goals']) && !empty($data['goals'])) {
+            $created_goals = $this->goalService->createGoalsWithWorkprocesses($new_sprint, $data['goals']);
+            $new_sprint['goals'] = $created_goals;
+        }
+        $resource = !empty($new_sprint->goals)
+            ? new SprintWithGoalsResource($new_sprint)
+            : new SprintResource($new_sprint);
+
         return ApiResponse::successWithMessage(
             'Sprint has been successfully created',
-            new SprintResource($new_sprint)
+            $resource
+        );
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $sprint = Sprint::with(['status'])->find($id);
+
+        if (!$sprint) return ApiResponse::notFound();
+
+        $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')
+            ->where('sprint_id', $sprint->id)
+            ->get();
+
+        return ApiResponse::successWithoutMessage(
+            new SprintWithGoalsResource($sprint)
         );
     }
 
@@ -77,46 +117,78 @@ class SprintController extends Controller
         $teacher_fields = [
             'feedback',
         ];
+        $sprint_fields = [
+            'reflection',
+            'feedback',
+        ];
+        $api_key = $request['api_key'];
         $data = $request->validated();
+        $user_id = ApiKey::getUserId($api_key);
         $sprint = Sprint::find($id);
-
-        if (!$data){
+    
+        if (!$user_id) return ApiResponse::accessDenied();
+        if (!$sprint) return ApiResponse::notFound();
+        if (!Project::userHasAccess($user_id, $sprint->project_id)) return ApiResponse::accessDenied();
+    
+        if (
+            empty($data['reflection']) &&
+            empty($data['feedback']) &&
+            empty($data['goals']['create']) &&
+            empty($data['goals']['update']) &&
+            empty($data['goals']['delete'])
+        ) {
             return ApiResponse::noDataToUpdate();
         }
-
-        if (!$sprint){
-            return ApiResponse::notFound();
-        }
-
-        $current_user_id = ApiKey::getUserId($data['api_key']);
-
-        if (!User::isTeacher($current_user_id)){
-            //---is-owner---
-            if (Project::getUserIdByProjectId($sprint->project_id) != $current_user_id){
-                return ApiResponse::accessDenied();
-            }
-
-            $data = array_diff_key($data, array_flip($teacher_fields));
-        }
-        unset($data['api_key']);
         
-        $unchanged = true;
-        foreach ($data as $key => $value) {
-            if ($sprint->$key !== $value) {
-                $unchanged = false;
-                break;
+        if (!User::isTeacher($user_id)) {
+            $data = array_diff_key($data ?? [], array_flip($teacher_fields));
+        }
+        $sprint_data = Arr::only($data, $sprint_fields);
+        $has_changes = false;
+
+        if (!empty($sprint_data)) {
+            if ($this->sprintService->updateSprintInfo($sprint, $sprint_data)) {
+                $has_changes = true;
             }
         }
-
-        if ($unchanged) {
+    
+        if (!empty($data['goals'])) {
+            if ($this->goalService->handle($sprint, $data['goals'])) {
+                $has_changes = true;
+            }
+        }
+    
+        if (!$has_changes) {
             return ApiResponse::noChangesDetected();
         }
-
-        $sprint->update($data);
-
+    
+        $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')->where('sprint_id', $sprint->id)->get();
+    
         return ApiResponse::successWithMessage(
             'Sprint updated successfully',
-            new SprintResource($sprint)
+            new SprintWithGoalsResource($sprint)
+        );
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Request $request, string $id)
+    {
+        $sprint = Sprint::find($id);
+
+        if (!$sprint) return ApiResponse::notFound();
+
+        $current_user_id = ApiKey::getUserId($request->api_key);
+        
+        if (!Project::userHasAccess($current_user_id, $sprint->project_id)){
+            return ApiResponse::accessDenied();
+        }
+        
+        $sprint->delete($id);
+
+        return ApiResponse::successWithMessage(
+            'Sprint successfully deleted'
         );
     }
 }

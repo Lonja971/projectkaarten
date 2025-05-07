@@ -5,14 +5,10 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SprintController;
 
-//Route::get('/user', function (Request $request) {
-    //    return $request->user();
-    //})->middleware('auth:sanctum');
-
 //---USERS---
 
-Route::get('/users/search', [UserController::class, 'search']);
-
+Route::middleware('api_key.teacher', 'throttle:cooldown-api')
+    ->get('/users/search', [UserController::class, 'search']);
 Route::middleware('api_key.teacher', 'throttle:cooldown-api')
     ->apiResource('/users', UserController::class);
 
@@ -29,4 +25,9 @@ Route::middleware('api_key.teacher', 'throttle:cooldown-api')
 //---SPRINTS---
 
 Route::middleware('api_key', 'throttle:cooldown-api')
-    ->apiResource('/sprints', SprintController::class);
+    ->apiResource('/sprints', SprintController::class)
+    ->except('index');
+
+Route::middleware('api_key.teacher', 'throttle:cooldown-api')
+    ->apiResource('/sprints', SprintController::class)
+    ->only('index');

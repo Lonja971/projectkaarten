@@ -35,7 +35,7 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'api_key' => 'required|string|max:255',
+            'user_id' => 'integer|exists:users,id',
             'title' => 'required|string|max:255',
             'date_end' => 'required|date|after_or_equal:date_start',
             'icon_id' => 'integer',

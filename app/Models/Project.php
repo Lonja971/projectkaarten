@@ -21,6 +21,12 @@ class Project extends Model
         'icon_id' => 1,
         'background_id' => 38,
     ];
+
+    protected $casts = [
+        'user_id' => 'integer',
+        'icon_id' => 'integer',
+        'background_id' => 'integer',
+    ];
     
     public function status()
     {
@@ -139,5 +145,19 @@ class Project extends Model
     public static function getUserIdByProjectId(int $project_id)
     {
         return Project::where('id', $project_id)->value('user_id');
+    }
+
+    /**
+     * Check if a user has access to a specific project.
+     *
+     * @param int $userId The ID of the user.
+     * @param int $projectId The ID of the project.
+     * @return bool True if the user has access, false otherwise.
+     */
+    public static function userHasAccess(int $user_id, int $project_id): bool
+    {
+        if (User::isTeacher($user_id)) return true;
+        
+        return Project::getUserIdByProjectId($project_id) === $user_id;
     }
 }
