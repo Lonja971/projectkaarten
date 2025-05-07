@@ -21,6 +21,12 @@ class Project extends Model
         'icon_id' => 1,
         'background_id' => 38,
     ];
+
+    protected $casts = [
+        'user_id' => 'integer',
+        'icon_id' => 'integer',
+        'background_id' => 'integer',
+    ];
     
     public function status()
     {

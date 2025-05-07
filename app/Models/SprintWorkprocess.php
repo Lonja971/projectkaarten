@@ -31,4 +31,18 @@ class SprintWorkprocess extends Model
     {
         return $this->belongsTo(Workprocess::class);
     }
+
+    public static function findByGoalAndProcess(int $goal_id, int $workprocess_id): ?self
+    {
+        return self::where('sprint_goal_id', $goal_id)
+            ->where('workprocess_id', $workprocess_id)
+            ->first();
+    }
+
+    public static function existsForGoalAndWorkprocess(int $goal_id, int $workprocess_id): bool
+    {
+        return self::where('sprint_goal_id', $goal_id)
+            ->where('workprocess_id', $workprocess_id)
+            ->exists();
+    }
 }

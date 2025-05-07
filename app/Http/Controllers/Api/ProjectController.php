@@ -33,15 +33,19 @@ class ProjectController extends Controller
         $data = $request->validated();
 
         $current_user_id = ApiKey::getUserId($api_key);
-
+        
         if (!$current_user_id) {
             return ApiResponse::accessDenied();
         }
-        $data['user_id'] = $current_user_id;
-        
+
         //---Set-data-for-project---
-        $data['project_by_student'] = User::incrementProjectIndex($current_user_id);
+        $is_teacher = User::isTeacher($current_user_id);
+        if ($is_teacher && empty($data['user_id']) || !$is_teacher){
+            $data['user_id'] = $current_user_id;
+        }
+        $data['project_by_student'] = User::incrementProjectIndex($data['user_id']);
         $data['date_start'] = now();
+        
 
         $new_project = Project::create($data);
 
