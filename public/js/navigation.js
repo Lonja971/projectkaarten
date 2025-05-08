@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 date_end: dateInput.value,
                 icon_id: iconInput.value,
                 background_id: bgInput.value,
-                api_key: "rgttrtrgtrgtrgt",
+                api_key: "w5abnZHBtWTWGQkTRrTTbyFYk2Hbvz5y",
 
             })
               .then(response => {

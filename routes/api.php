@@ -17,6 +17,8 @@ Route::middleware('api_key.teacher', 'throttle:cooldown-api')
 Route::middleware('api_key', 'throttle:cooldown-api')
     ->apiResource('/projects', ProjectController::class)
     ->only('show', 'store', 'update');
+Route::middleware('api_key', 'throttle:cooldown-api')
+    ->get('/projects-by-user', [ProjectController::class, 'byUser']);
 
 Route::middleware('api_key.teacher', 'throttle:cooldown-api')
     ->apiResource('/projects', ProjectController::class)
@@ -27,6 +29,8 @@ Route::middleware('api_key.teacher', 'throttle:cooldown-api')
 Route::middleware('api_key', 'throttle:cooldown-api')
     ->apiResource('/sprints', SprintController::class)
     ->except('index');
+Route::middleware('api_key', 'throttle:cooldown-api')
+    ->get('/sprints-by-project', [SprintController::class, 'byProject']);
 
 Route::middleware('api_key.teacher', 'throttle:cooldown-api')
     ->apiResource('/sprints', SprintController::class)

@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Users;
 
-use App\Helpers\Response;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateUserRequest extends FormRequest
+class StoreUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +23,7 @@ class UpdateUserRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'status' => 'error',
-                'message' => 'Validation failed',
+                'message' => 'Store failed',
                 'errors' => $validator->errors()
             ], 422)
         );
@@ -38,11 +37,10 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name' => 'string|max:255',
-            'email' => 'string|email|max:255|unique:users,email',
-            'password' => '',
-            Password::defaults(),
-            'identifier' => 'string|unique:users,identifier',
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'role_id' => 'required|integer|exists:roles,id',
+            'identifier' => 'required|string|unique:users,identifier',
         ];
     }
 }

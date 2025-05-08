@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Requests\Projects\StoreProjectRequest;
+use App\Http\Requests\Projects\UpdateProjectRequest;
+use App\Http\Requests\Users\UserIdRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\ApiKey;
 use App\Models\Project;
@@ -20,8 +21,31 @@ class ProjectController extends Controller
     public function index()
     {
         return response()->json([
-            Project::query()->orderBy('id', 'asc')->paginate(10)
+            Project::query()
+                ->orderBy('id', 'asc')
+                ->paginate(env('PAGINATION_LIMIT'))
         ]);
+    }
+
+    /**
+     * Show the list of user projects
+     */
+    public function byUser(Request $request)
+    {
+        $api_key = $request['api_key'];
+        $current_user_id = ApiKey::getUserId($api_key);
+        $is_teacher = User::isTeacher($current_user_id);
+        $user_id = $is_teacher ? $request->input('user_id') : $current_user_id;
+
+        if ($is_teacher && !$user_id) {
+            return ApiResponse::notFound();
+        }
+    
+        $projects = Project::where('user_id', $user_id)
+            ->orderBy('id', 'asc')
+            ->paginate(env('PAGINATION_LIMIT'));
+    
+        return response()->json(['data' => $projects]);
     }
 
     /**
@@ -86,13 +110,13 @@ class ProjectController extends Controller
         $data = $request->validated();
         $project = Project::find($id);
         $current_user_id = ApiKey::getUserId($api_key);
-        $isTeacher = User::isTeacher($current_user_id);
-        $isOwner = Project::getUserIdByProjectId($project->id) == $current_user_id;
+        $is_teacher = User::isTeacher($current_user_id);
+        $is_owner = Project::getUserIdByProjectId($project->id) == $current_user_id;
         
-        if (!$isTeacher && !$isOwner) return ApiResponse::accessDenied();
+        if (!$is_teacher && !$is_owner) return ApiResponse::accessDenied();
         if (!$project) return ApiResponse::notFound();
 
-        if (!$isTeacher) {
+        if (!$is_teacher) {
             $data = array_diff_key($data, array_flip($teacher_fields));
         }
 

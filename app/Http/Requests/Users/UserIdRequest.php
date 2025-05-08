@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Users;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreProjectRequest extends FormRequest
+class UserIdRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,8 +21,7 @@ class StoreProjectRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'status' => 'error',
-                'message' => 'Store failed',
-                'errors' => $validator->errors()
+                'message' => 'Not Found'
             ], 422)
         );
     }
@@ -35,11 +34,7 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'integer|exists:users,id',
-            'title' => 'required|string|max:255',
-            'date_end' => 'required|date|after_or_equal:date_start',
-            'icon_id' => 'integer',
-            'background_id' => 'integer',
+            'user_id' => 'required|integer',
         ];
     }
 }
