@@ -2,6 +2,12 @@
     <!-- Session Status -->
     <x-auth-session-status :status="session('status')" />
 
+    <style>
+        .email-block-none{
+            display: none;
+        }
+    </style>
+
     <section class="flex flex-col justify-center items-center gap-[20px] p-[50px] min-w-[400px] !border-[0.5px] !border-[#ccc] rounded-[25px] bg-[#fff]">
         <form method="POST" action="{{ route('register') }}" class="flex flex-col gap-[20px]">
             @csrf
@@ -24,19 +30,10 @@
                     <x-input-error :messages="$errors->get('full_name')" />
                 </div>
 
-                <!-- Email Address -->
-                <div class="flex flex-col gap-[8px]">
-                    <p class="text-[20px] text-[#000]">{{ __('Email') }}</p>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" required autocomplete="username" placeholder="Email" />
-                    <x-input-error :messages="$errors->get('email')" />
-                </div>
-            </div>
-
-            <div class="flex gap-[20px]">   
                 <!-- Role -->
                 <div class="flex flex-col gap-[8px]">
                     <p class="text-[20px] text-[#000]">{{ __('Role') }}</p>
-                    <select id="role" name="role_id" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-[224px]">
+                    <select id="role" name="role_id" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit">
                         @foreach($roles as $role)
                             <option value="{{$role->id}}"
                                 {{ old('role_id', 2) == $role->id ? 'selected' : '' }}>
@@ -48,6 +45,9 @@
                         <div class="text-red-500 text-[16px]">{{ $message }}</div>
                     @enderror
                 </div>
+            </div>
+
+            <div class="flex gap-[20px]">   
 
                 <!-- Student Number / Afkorting -->
                 <div id="identifier_block" class="flex flex-col gap-[8px]">
@@ -57,10 +57,17 @@
                         <div class="text-red-500 text-[16px]">{{ $message }}</div>
                     @enderror
                 </div>
+
+                <!-- Email Address -->
+                <div id="email_block" class="email-block-none flex flex-col gap-[8px]">
+                    <p class="text-[20px] text-[#000]">{{ __('Email') }}</p>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" required autocomplete="username" placeholder="Email" />
+                    <x-input-error :messages="$errors->get('email')" />
+                </div>
             </div>
 
             <div class="flex justify-between items-center">
-                <a href="{{ route('password.request') }}" class="!text-[#000] !font-[Inter] !text-[16px] hover:underline">
+                <a href="{{ route('import-users-excel') }}" class="!text-[#000] !font-[Inter] !text-[16px] hover:underline">
                     Sheet importeren?
                 </a>
 
@@ -74,6 +81,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const roleSelect = document.getElementById('role');
+            const emailBlock = document.getElementById('email_block');
             const identifierLabel = document.getElementById('identifier_label');
             const identifierInput = document.getElementById('identifier');
             
@@ -85,12 +93,14 @@
             
             function updateIdentifierField() {
                 // Find the selected option text
-                const selectedText = roleSelect.options[roleSelect.selectedIndex].text.trim().toLowerCase();
-                
-                if (selectedText === 'docent') {
+                console.log(roleSelect.value);
+                if (roleSelect.value === 1) {
                     identifierLabel.textContent = 'Afkorting';
                     identifierInput.placeholder = 'Afkorting';
+
+                    emailBlock.classList.remove("email-block-none");
                 } else {
+                    emailBlock.classList.add("email-block-none");
                     identifierLabel.textContent = 'Studentnummer';
                     identifierInput.placeholder = 'Studentnummer';
                 }

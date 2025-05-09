@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Users;
+
+use Illuminate\Foundation\Http\FormRequest;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreSprintRequest extends FormRequest
+class StoreUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -35,18 +36,10 @@ class StoreSprintRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => 'required|integer',
-            'date_start' => 'required|date|after_or_equal:today',
-            'date_end' => 'required|date|after_or_equal:date_start',
-
-            //---GOALS-ARRAY-VALIDATION---
-            'goals' => 'nullable|array',
-            'goals.*.description' => 'required|string',
-            'goals.*.is_retrospective' => 'required|boolean',
-
-            //---WORKPROCESSES-ARRAY-VALIDATION---
-            'goals.*.workprocess_ids' => 'nullable|array',
-            'goals.*.workprocess_ids.*' => 'required|integer|exists:work_processes,id',
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'role_id' => 'required|integer|exists:roles,id',
+            'identifier' => 'required|string|unique:users,identifier',
         ];
     }
 }

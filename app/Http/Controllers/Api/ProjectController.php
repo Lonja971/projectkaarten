@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Requests\Projects\StoreProjectRequest;
+use App\Http\Requests\Projects\UpdateProjectRequest;
+use App\Http\Requests\Users\UserIdRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\ApiKey;
 use App\Models\Project;
@@ -20,8 +21,31 @@ class ProjectController extends Controller
     public function index()
     {
         return response()->json([
-            Project::query()->orderBy('id', 'asc')->paginate(10)
+            Project::query()
+                ->orderBy('id', 'asc')
+                ->paginate(env('PAGINATION_LIMIT'))
         ]);
+    }
+
+    /**
+     * Show the list of user projects
+     */
+    public function byUser(Request $request)
+    {
+        $api_key = $request['api_key'];
+        $current_user_id = ApiKey::getUserId($api_key);
+        $is_teacher = User::isTeacher($current_user_id);
+        $user_id = $is_teacher ? $request->input('user_id') : $current_user_id;
+
+        if ($is_teacher && !$user_id) {
+            return ApiResponse::notFound();
+        }
+
+        $projects = Project::where('user_id', $user_id)
+            ->orderBy('id', 'asc')
+            ->paginate(env('PAGINATION_LIMIT'));
+
+        return response()->json(['data' => $projects]);
     }
 
     /**
@@ -33,19 +57,19 @@ class ProjectController extends Controller
         $data = $request->validated();
 
         $current_user_id = ApiKey::getUserId($api_key);
-        
+
         if (!$current_user_id) {
             return ApiResponse::accessDenied();
         }
 
         //---Set-data-for-project---
         $is_teacher = User::isTeacher($current_user_id);
-        if ($is_teacher && empty($data['user_id']) || !$is_teacher){
+        if ($is_teacher && empty($data['user_id']) || !$is_teacher) {
             $data['user_id'] = $current_user_id;
         }
         $data['project_by_student'] = User::incrementProjectIndex($data['user_id']);
         $data['date_start'] = now();
-        
+
 
         $new_project = Project::create($data);
 
@@ -61,7 +85,7 @@ class ProjectController extends Controller
     public function show(string $id)
     {
         $project = Project::with(['sprints.status', 'status'])->find($id);
-        
+
         if (!$project) {
             return ApiResponse::notFound();
         }
@@ -77,7 +101,7 @@ class ProjectController extends Controller
     {
         $teacher_fields = [
             'reflection',
-            'raiting',
+            'rating',
             'feedback',
             'denial_reason',
             'status_id',
@@ -86,13 +110,13 @@ class ProjectController extends Controller
         $data = $request->validated();
         $project = Project::find($id);
         $current_user_id = ApiKey::getUserId($api_key);
-        $isTeacher = User::isTeacher($current_user_id);
-        $isOwner = Project::getUserIdByProjectId($project->id) == $current_user_id;
-        
-        if (!$isTeacher && !$isOwner) return ApiResponse::accessDenied();
+        $is_teacher = User::isTeacher($current_user_id);
+        $is_owner = Project::getUserIdByProjectId($project->id) == $current_user_id;
+
+        if (!$is_teacher && !$is_owner) return ApiResponse::accessDenied();
         if (!$project) return ApiResponse::notFound();
 
-        if (!$isTeacher) {
+        if (!$is_teacher) {
             $data = array_diff_key($data, array_flip($teacher_fields));
         }
 
@@ -130,7 +154,7 @@ class ProjectController extends Controller
         if (!$project) {
             return ApiResponse::notFound();
         }
-        if ($project->user_id != $current_user_id && !$is_teacher){
+        if ($project->user_id != $current_user_id && !$is_teacher) {
             return ApiResponse::accessDenied();
         }
 

@@ -6,8 +6,8 @@ use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\Users\StoreUserRequest;
+use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\ApiKey;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +19,7 @@ class UserController extends Controller
     public function index()
     {
         return response()->json([
-            User::query()->orderBy('id', 'asc')->paginate(10)
+            User::query()->orderBy('id', 'asc')->paginate(env('PAGINATION_LIMIT'))
         ]);
     }
 
@@ -27,8 +27,8 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        $data['email'] = strtolower($data['email']);
         $data['identifier'] = strtolower($data['identifier']);
+        $data['email'] = $data['identifier'] . "@st.deltion.nl";
         $password = Str::random(12);
         $data['password'] = Hash::make($password);
 
