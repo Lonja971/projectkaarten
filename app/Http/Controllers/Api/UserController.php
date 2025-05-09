@@ -26,9 +26,9 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-
+        if ($data['role_id'] != env('TEACHER_ROLE_ID')) $data['email'] = $data['identifier'] . env('STUDENT_EMAIL_DOMAIN');
         $data['identifier'] = strtolower($data['identifier']);
-        $data['email'] = $data['identifier'] . "@st.deltion.nl";
+        $data['email'] = strtolower($data['email']);
         $password = Str::random(12);
         $data['password'] = Hash::make($password);
 

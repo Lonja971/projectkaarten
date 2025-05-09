@@ -37,9 +37,9 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'full_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
+            'email' => 'nullable|string|email|max:255|unique:users,email',
             'role_id' => 'required|integer|exists:roles,id',
-            'identifier' => 'required|string|unique:users,identifier',
+            'identifier' => 'required|string|unique:users,identifier|regex:/^\S*$/u',
         ];
     }
 }

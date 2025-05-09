@@ -3,7 +3,7 @@
    <h2 class="text-2xl font-bold mb-4">Gebruikers importeren via Excel</h2>
 
    <label class="block mb-2 text-sm font-medium text-gray-700" for="file">Selecteer een Excel-bestand</label>
-   <input type="file" name="file" id="file" accept=".xlsx,.xls" required
+   <input type="file" name="file" id="file" accept=".xlsx,.xls,.csv" required
           class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none">
 
    <button type="submit"

@@ -46,11 +46,12 @@ class RegisteredUserController extends Controller
 
         $rules = [
             'full_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', Rules\Password::defaults()],
+            'email' => ['string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'role_id' => ['required', 'integer', 'exists:roles,id'],
-            'identifier' => ['required', 'string', 'lowercase', 'unique:users,identifier'],
+            'identifier' => ['required', 'string', 'lowercase', 'unique:users,identifier', 'regex:/^\S*$/u'],
         ];
+
+        if ($request['role_id'] != env('TEACHER_ROLE_ID')) $request['email'] = $request['identifier'] . env('STUDENT_EMAIL_DOMAIN');
     
         $validatedData = $request->validate($rules);
 
@@ -78,12 +79,10 @@ class RegisteredUserController extends Controller
     {
         $required_rows = [
             "full_name",
-            "identifier",
-            "role_id",
-            "email"
+            "identifier"
         ];
         $request->validate([
-            'file' => 'required|file|mimes:xls,xlsx'
+            'file' => 'required|file|mimes:xls,xlsx,csv'
         ]);
         $file = $request->file('file');
         $spreadsheet = IOFactory::load($file->getPathname());
@@ -109,8 +108,8 @@ class RegisteredUserController extends Controller
 
             $data = [
                 'full_name' => $row[array_search('full_name', $header)],
-                'email' => $row[array_search('email', $header)],
-                'role_id' => $row[array_search('role_id', $header)],
+                'email' => $row[array_search('identifier', $header)] . env('STUDENT_EMAIL_DOMAIN'),
+                'role_id' => 2,
                 'identifier' => $row[array_search('identifier', $header)],
             ];
             $userRequest = new StoreUserRequest();

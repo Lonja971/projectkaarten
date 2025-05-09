@@ -50,7 +50,10 @@
             <div class="flex gap-[20px]">   
 
                 <!-- Student Number / Afkorting -->
-                <div id="identifier_block" class="flex flex-col gap-[8px]">
+                <div 
+                    id="identifier_block"
+                    class="flex flex-col gap-[8px]"
+                >
                     <p id="identifier_label" class="text-[20px] text-[#000]">{{ __('Studentnummer') }}</p>
                     <input id="identifier" type="text" name="identifier" value="{{ old('identifier') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" required placeholder="Studentnummer">
                     @error('identifier')
@@ -61,7 +64,7 @@
                 <!-- Email Address -->
                 <div id="email_block" class="email-block-none flex flex-col gap-[8px]">
                     <p class="text-[20px] text-[#000]">{{ __('Email') }}</p>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" required autocomplete="username" placeholder="Email" />
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" autocomplete="username" placeholder="Email" />
                     <x-input-error :messages="$errors->get('email')" />
                 </div>
             </div>
@@ -82,6 +85,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const roleSelect = document.getElementById('role');
             const emailBlock = document.getElementById('email_block');
+            const emailInput = document.getElementById('email');
             const identifierLabel = document.getElementById('identifier_label');
             const identifierInput = document.getElementById('identifier');
             
@@ -94,13 +98,22 @@
             function updateIdentifierField() {
                 // Find the selected option text
                 console.log(roleSelect.value);
-                if (roleSelect.value === 1) {
+                if (parseInt(roleSelect.value) === 1) {
                     identifierLabel.textContent = 'Afkorting';
                     identifierInput.placeholder = 'Afkorting';
 
+                    emailInput.required = true;
                     emailBlock.classList.remove("email-block-none");
+                    if (!emailBlock.contains(emailInput)) {
+                        emailBlock.appendChild(emailInput);
+                    }
                 } else {
                     emailBlock.classList.add("email-block-none");
+                    emailInput.required = false;
+                    if (emailBlock.contains(emailInput)) {
+                        emailBlock.removeChild(emailInput);
+                    }
+
                     identifierLabel.textContent = 'Studentnummer';
                     identifierInput.placeholder = 'Studentnummer';
                 }
