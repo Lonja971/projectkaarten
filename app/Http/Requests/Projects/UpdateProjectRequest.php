@@ -38,9 +38,9 @@ class UpdateProjectRequest extends FormRequest
             'title' => 'string|max:255',
             'icon_id' => 'integer',
             'background_id' => 'integer',
-            
+
             'reflection' => 'string|max:255',
-            'raiting' => 'integer|max:11',
+            'rating' => 'integer|max:11',
             'feedback' => 'string|max:255',
             'denial_reason' => 'string|max:255',
             'status_id' => 'integer',

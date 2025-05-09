@@ -22,7 +22,7 @@ class ProjectResource extends JsonResource
             'date_end' => $this->date_end,
             'date_end' => $this->date_end,
             'reflection' => $this->reflection,
-            'raiting' => $this->raiting,
+            'rating' => $this->rating,
             'feedback' => $this->feedback,
             'denial_reason' => $this->denial_reason,
             'status' => new ProjectStatusResource($this->status),

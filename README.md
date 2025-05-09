@@ -49,7 +49,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 #### Alle gebruikers ophalen ( paginate - 10 )
 
-```http
+```
   ${domain}/api/users?api_key=${api_key}
 ```
 | Parameter | Type     | Description                       |
@@ -59,7 +59,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 #### Nieuwe gebruiker opslaan
 
-```http
+```
   ${domain}/api/users?api_key=${api_key}&full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
 ```
 
@@ -75,7 +75,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 #### Gebruiker ophalen by id
 
-```http
+```
   ${domain}/api/users/${id}?api_key=${api_key}&column=${column}
 ```
 
@@ -89,7 +89,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 #### Gebruiker bijwerken
 
-```http
+```
   ${domain}/api/users/${id}?api_key=${api_key}&full_name=${full_name}&identifier=${identifier}&role_id=${role_id}&email=${email}&password=${password}
 ```
 
@@ -106,7 +106,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 #### Gebruiker vernietigen
 
-```http
+```
   ${domain}/api/users/${id}?api_key=${api_key}
 ```
 
@@ -118,7 +118,7 @@ Hernoem het .env-voorbeeld naar .env-bestand. Voeg daar uw database-informatie t
 
 #### Zoek gebruiker (vind gebruikers-id)
 
-```http
+```
   ${domain}/api/users/search?api_key=${api_key}&column=${column}&value=${value}
 ```
 

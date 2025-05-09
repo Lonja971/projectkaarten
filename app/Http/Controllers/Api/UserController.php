@@ -27,8 +27,8 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        $data['email'] = strtolower($data['email']);
         $data['identifier'] = strtolower($data['identifier']);
+        $data['email'] = $data['identifier'] . "@st.deltion.nl";
         $password = Str::random(12);
         $data['password'] = Hash::make($password);
 

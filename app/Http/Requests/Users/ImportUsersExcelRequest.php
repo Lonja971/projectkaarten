@@ -4,10 +4,7 @@ namespace App\Http\Requests\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
-
-class StoreUserRequest extends FormRequest
+class ImportUsersExcelRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,17 +12,6 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            response()->json([
-                'status' => 'error',
-                'message' => 'Store failed',
-                'errors' => $validator->errors()
-            ], 422)
-        );
     }
 
     /**
@@ -37,8 +23,6 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'full_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'role_id' => 'required|integer|exists:roles,id',
             'identifier' => 'required|string|unique:users,identifier',
         ];
     }
