@@ -32,6 +32,12 @@ class HomeController extends Controller
             'name' => ''
         ];
         
+        // Initialize all sprint filter values with defaults first
+        $sprintFilters = [
+            'sort' => 'creation-date-asc', // Default sort value
+            'name' => ''
+        ];
+        
         // If no POST request (initial page load), add default filters
         if (!$request->isMethod('post')) {
             // Calculate current schoolyear for default filter

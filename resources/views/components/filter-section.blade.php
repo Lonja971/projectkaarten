@@ -24,11 +24,11 @@
             </div>
             <div>
                <input type="radio" {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-asc' ? 'checked' : '' }} name="sort" id="sort-end-date-asc" value="end-date-asc" class="hidden-input" />
-               <label for="sort-end-date-asc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-asc' ? 'checked' : '' }}">Einddatum (Eerstvolgend -> Laatste)</label>
+               <label for="sort-end-date-asc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-asc' ? 'checked' : '' }}">Deadline (Eerstvolgend -> Laatste)</label>
             </div>
             <div>
                <input type="radio" {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-desc' ? 'checked' : '' }} name="sort" id="sort-end-date-desc" value="end-date-desc" class="hidden-input" />
-               <label for="sort-end-date-desc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-desc' ? 'checked' : '' }}">Einddatum (Laatste -> Eerstvolgend)</label>
+               <label for="sort-end-date-desc" class="border-[0.5px] border-[#ccc] pl-[10px] pr-[10px] pt-[4px] pb-[4px] rounded-[100px] font-[Inter] cursor-pointer {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'end-date-desc' ? 'checked' : '' }}">Deadline (Laatste -> Eerstvolgend)</label>
             </div>
             <div>
                <input type="radio" {{ isset($projectFilters['sort']) && $projectFilters['sort'] === 'name-asc' ? 'checked' : '' }} name="sort" id="sort-a-z" value="name-asc" class="hidden-input" />

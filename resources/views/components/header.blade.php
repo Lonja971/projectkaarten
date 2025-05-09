@@ -1,8 +1,8 @@
-@props(['user' => Auth::user()])
+@props(['user' => Auth::user(), 'title' => null, 'subtitle' => null, 'subtitleurl' => null])
 
 <header class="flex justify-between items-center min-h-[100px] pl-[20px] pr-[20px] relative z-20">
-    <div class="flex justify-start items-center gap-[20px]">
-        <img src="https://ict-flex.nl/wp-content/uploads/2023/08/ICT-Flex-v2.png" alt="ICT Flex" class="h-[60px]"></img>
+    <a href="{{ route('home') }}" class="flex justify-start items-center gap-[20px]">
+        <img src="{{ asset('icon.png') }}" alt="ICT Flex" class="h-[60px]"></img>
         <h1 class="text-[48px] font-bold font-[Inter] text-[#fff]">Projectkaarten
             @if ($user && $user->role && $user->role->name === "Docent")
                  | Docent
@@ -10,7 +10,7 @@
                  | Student
             @endif
         </h1>
-    </div>
+    </a>
     <div class="flex flex-col justify-center items-end">
         @if ($user)
             <span class="text-[24px] font-bold font-[Inter] text-[#fff]">{{ $user->full_name }}</span>
@@ -41,18 +41,10 @@
 <section class="min-h-[480px] pt-[160px] mt-[-160px] relative flex items-center pl-[20px] pr-[20px]">
     <div class="absolute inset-0 bg-[url('https://ict-flex.nl/wp-content/uploads/2023/10/deltion3large.webp')] bg-cover bg-center bg-no-repeat"></div>
     <div class="absolute inset-0 bg-black opacity-60"></div>
-    @php
-        // Dynamically determine page title based on current route
-        $pageTitle = 'Overzicht';
-        if (request()->routeIs('help')) {
-            $pageTitle = 'Help';
-        } elseif (request()->routeIs('login')) {
-            $pageTitle = 'Login';
-        } elseif (request()->routeIs('register')) {
-            $pageTitle = 'Register';
-        } elseif (isset($title)) {
-            $pageTitle = $title;
-        }
-    @endphp
-    <span class="text-[48px] font-bold font-[Inter] text-[#fff] relative z-10">{{ $pageTitle }}</span>
+    
+    
+        <div class="relative z-10 flex flex-col">
+            @if ($subtitle)<a @if($subtitleurl) href="{{ $subtitleurl }}" @endif class="hover:underline text-[32px] font-bold font-[Inter] text-[#fff]">{{ $subtitle }}</a>@endif
+            @if ($title)<h2 class="text-[48px] font-bold font-[Inter] text-[#fff]">{{ $title }}</h2>@endif
+        </div>
 </section>
