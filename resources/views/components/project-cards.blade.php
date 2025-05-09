@@ -5,7 +5,7 @@
 @props(['projects' => [], 'user' => null])
 
 <section class="pl-[20px] pr-[20px] pt-[10px] pb-[10px]" style="min-height: calc(100vh - 68px);">
-   @if(isset($projects) && count($projects) > 0)
+   @if(isset($projects) && ((count($projects) > 0 && $user->role->name === "Docent") || ($user->role->name === "Student")))
       <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-[10px]">
          @if ($user->role && $user->role->name === "Student")
          <!-- New "Add Project" block -->

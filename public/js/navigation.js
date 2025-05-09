@@ -43,12 +43,30 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addProjectButton) {
         addProjectButton.addEventListener('click', function() {
             // Create custom modal popup
-            showCustomModal('test');
+            showProjectModal();
         });
     }
     
     // Function to show a custom modal with project creation form
-    function showCustomModal(message) {
+    function showProjectModal() {
+        // Fetch icons and backgrounds first
+        Promise.all([
+            axios.get('api/icons'),
+            axios.get('api/backgrounds')
+        ])
+        .then(([iconsResponse, backgroundsResponse]) => {
+            const icons = iconsResponse.data.data || [];
+            const backgrounds = backgroundsResponse.data.data || [];
+            createProjectModal(icons, backgrounds);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            alert('Er is een fout opgetreden bij het laden van de projectgegevens');
+        });
+    }
+    
+    // Create the project modal with the fetched data
+    function createProjectModal(icons, backgrounds) {
         // Create modal overlay (background)
         const overlay = document.createElement('div');
         overlay.style.position = 'fixed';
@@ -69,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.borderRadius = '20px';
         modal.style.padding = '20px';
         modal.style.minWidth = '500px';
-        modal.style.maxWidth = '600px';
+        modal.style.maxWidth = 'fit-content';
         modal.style.display = 'flex';
         modal.style.flexDirection = 'column';
         modal.style.gap = '20px';
@@ -149,26 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const iconContainer = document.createElement('div');
         iconContainer.style.display = 'grid';
-        iconContainer.style.gridTemplateColumns = 'repeat(12, 1fr)';
+        iconContainer.style.gridTemplateColumns = 'repeat(24, 1fr)';
         iconContainer.style.gap = '8px';
         iconContainer.style.justifyItems = 'center';
         iconContainer.style.padding = '0';
         
-        // Popular icon options (sampling from our IconSeeder)
-        const iconOptions = [
-            'fa-solid fa-globe', 'fa-solid fa-puzzle-piece', 'fa-solid fa-briefcase',
-            'fa-solid fa-laptop-code', 'fa-solid fa-book', 'fa-solid fa-graduation-cap',
-            'fa-solid fa-code', 'fa-solid fa-database', 'fa-solid fa-mobile-alt',
-            'fa-solid fa-terminal', 'fa-solid fa-code-branch', 'fa-brands fa-github',
-            'fa-brands fa-docker', 'fa-brands fa-java', 'fa-brands fa-python',
-            'fa-brands fa-js', 'fa-brands fa-php', 'fa-brands fa-html5',
-            'fa-brands fa-css3', 'fa-brands fa-react', 'fa-solid fa-users',
-            'fa-solid fa-calendar', 'fa-solid fa-clipboard', 'fa-solid fa-desktop',
-            'fa-solid fa-shield-alt', 'fa-solid fa-brain', 'fa-solid fa-tools',
-            'fa-solid fa-rocket', 'fa-solid fa-lightbulb', 'fa-solid fa-search',
-            'fa-solid fa-envelope', 'fa-solid fa-file-code', 'fa-solid fa-images',
-            'fa-solid fa-wrench', 'fa-solid fa-cog', 'fa-solid fa-star'
-        ];
+        // We are using icons data from the API now
+        // Show all available icons
+        const iconOptions = icons;
         
         // Hidden input to store the selected icon
         const iconInput = document.createElement('input');
@@ -178,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
         iconInput.setAttribute('required', 'true');
         
         // Create icon buttons
-        iconOptions.forEach((icon, index) => {
+        iconOptions.forEach(icon => {
             const iconButton = document.createElement('button');
             iconButton.setAttribute('type', 'button');
             iconButton.classList.add('icon-option');
@@ -193,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
             iconButton.style.transition = 'all 0.2s';
             
             const iconElement = document.createElement('i');
-            iconElement.className = icon;
+            iconElement.className = icon.icon; // Use the icon class from API
             
             iconButton.appendChild(iconElement);
             
@@ -210,8 +216,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.color = '#fff';
                 this.style.border = '1px solid #ef7e05';
                 
-                // Set the value of the hidden input
-                iconInput.value = String(index + 1); // Icon IDs start from 1
+                // Set the value of the hidden input to the actual database ID
+                iconInput.value = String(icon.id); // Use the actual ID from the API
             });
             
             iconContainer.appendChild(iconButton);
@@ -234,34 +240,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const bgContainer = document.createElement('div');
         bgContainer.style.display = 'grid';
-        bgContainer.style.gridTemplateColumns = 'repeat(12, 1fr)';
+        bgContainer.style.gridTemplateColumns = 'repeat(24, 1fr)';
         bgContainer.style.gap = '8px';
         bgContainer.style.justifyItems = 'center';
         bgContainer.style.padding = '0';
         
-        // Background color options organized by color family, sorted from brightest to darkest
-        const bgColors = [
-            // Reds
-            '#722F37', '#A52A2A', '#701C1C', '#800000', '#4A0000',
-            // Oranges
-            '#CC5500', '#CD7F32', '#9F6000', '#8B3103',
-            // Yellows/Golds
-            '#DAA520', '#B38B00', '#8B7500', '#808000',
-            // Greens
-            '#228B22', '#355E3B', '#01796F',
-            // Teals/Turquoise
-            '#008080', '#005F5F',
-            // Blues
-            '#003153', '#000080', '#191970',
-            // Purples/Violets
-            '#C154C1', '#BD33A4', '#5D3FD3', '#311432',
-            // Pinks/Magentas
-            '#C85A72', '#872657', '#800020',
-            // Browns
-            '#635147', '#5D4037', '#3D2B1F',
-            // Grays/Slate
-            '#708090', '#36454F', '#2A3439'
-        ];
+        // We are using backgrounds data from the API now
+        // Show all available colors
+        const bgColors = backgrounds;
         
         // Hidden input to store the selected background color
         const bgInput = document.createElement('input');
@@ -271,14 +257,14 @@ document.addEventListener('DOMContentLoaded', function() {
         bgInput.setAttribute('required', 'true');
         
         // Create background color options
-        bgColors.forEach((color, index) => {
+        bgColors.forEach(background => {
             const colorButton = document.createElement('button');
             colorButton.setAttribute('type', 'button');
             colorButton.classList.add('color-option');
             colorButton.style.width = '36px';
             colorButton.style.height = '36px';
             colorButton.style.borderRadius = '5px';
-            colorButton.style.backgroundColor = color;
+            colorButton.style.backgroundColor = background.background_color; // Use color from API
             colorButton.style.border = '1px solid #ddd';
             colorButton.style.cursor = 'pointer';
             colorButton.style.transition = 'all 0.2s';
@@ -292,8 +278,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add selected class to clicked button
                 this.style.transform = 'scale(1.3)';
                 
-                // Set the value of the hidden input
-                bgInput.value = String(index + 1); // Background IDs start from 1
+                // Set the value of the hidden input to the actual database ID
+                bgInput.value = String(background.id); // Use the actual ID from the API
             });
             
             bgContainer.appendChild(colorButton);
@@ -330,17 +316,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            axios.post('http://127.0.0.1:8000/api/projects', {
+            axios.post('api/projects', {
                 title: titleInput.value,
                 date_end: dateInput.value,
-                icon_id: iconInput.value,
-                background_id: bgInput.value,
-                api_key: "rgttrtrgtrgtrgt",
+                icon_id: parseInt(iconInput.value, 10),  // Convert to integer
+                background_id: parseInt(bgInput.value, 10),  // Convert to integer
+                api_key: "J7IzjpCTyiwQfF7XDJHYr0In7Z3er4BX",
 
             })
               .then(response => {
                 receivedData = response.data;
-                window.location.replace(`http://127.0.0.1:8000/${userIdentifier}/${receivedData.data.project_by_student}`);
+                window.location.replace(`${userIdentifier}/${receivedData.data.project_by_student}`);
               })
               .catch(error => {
                 console.error('API Error:', error.response?.data || error.message);
