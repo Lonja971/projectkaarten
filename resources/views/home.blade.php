@@ -11,12 +11,12 @@
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-      
+      <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
       <!-- Custom CSS -->
       <link href="{{ asset('css/home.css') }}" rel="stylesheet">
    </head>
    <body class="h-full flex flex-col min-h-screen">
-      <x-header />
+      <x-header title="Overzicht" />
       @if ($user)
          <x-navigation-buttons :user="$user" />
          

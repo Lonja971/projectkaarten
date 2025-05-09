@@ -32,8 +32,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
-            $table->timestamp('date_start');
-            $table->timestamp('date_end');
+            $table->timestamp('date_start')->nullable();
+            $table->timestamp('date_end')->nullable();
             $table->string('reflection')->nullable();
             $table->integer('rating')->nullable();
             $table->string('feedback')->nullable();

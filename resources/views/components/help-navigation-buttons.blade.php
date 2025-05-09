@@ -1,4 +1,4 @@
-@props(['user' => null])
+@props(['user' => Auth::user()])
 
 <section class="border-b-[0.5px] border-[#ddd] pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex gap-[20px] justify-between" id="help-navigation-buttons">
    <div class="flex gap-[20px]">
@@ -10,7 +10,7 @@
       >
          <i class="fa-solid fa-graduation-cap pr-[6px]"></i> Voor Student
       </button>
-      
+      @if ($user->role->name === "Docent")
       <button 
          id="docent-help-button"
          class="help-nav-toggle-button text-[#000] font-[Inter] text-[20px] border-[0.5px] border-[#ccc] pl-[20px] pr-[20px] pt-[8px] pb-[8px] rounded-[100px]"
@@ -19,7 +19,7 @@
       >
          <i class="fa-solid fa-chalkboard-user pr-[6px]"></i> Voor Docent
       </button>
-      
+      @endif      
       <button 
          id="api-help-button"
          class="help-nav-toggle-button text-[#000] font-[Inter] text-[20px] border-[0.5px] border-[#ccc] pl-[20px] pr-[20px] pt-[8px] pb-[8px] rounded-[100px]"
