@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreSprintRequest;
-use App\Http\Requests\UpdateSprintRequest;
+use App\Http\Requests\Projects\ProjectIdRequest;
+use App\Http\Requests\Sprints\StoreSprintRequest;
+use App\Http\Requests\Sprints\UpdateSprintRequest;
 use App\Http\Resources\SprintResource;
 use App\Http\Resources\SprintWithGoalsResource;
 use App\Models\ApiKey;
@@ -43,8 +44,28 @@ class SprintController extends Controller
     public function index()
     {
         return response()->json([
-            Sprint::query()->orderBy('id', 'asc')->paginate(10)
+            Sprint::query()->orderBy('id', 'asc')->paginate(env('PAGINATION_LIMIT'))
         ]);
+    }
+
+    /**
+     * Show the list of project sprints
+     */
+    public function byProject(ProjectIdRequest $request)
+    {
+        $api_key = $request['api_key'];
+        $data = $request->validated();
+        $current_user_id = ApiKey::getUserId($api_key);
+        $is_teacher = User::isTeacher($current_user_id);
+        $is_owner = Project::getUserIdByProjectId($data['project_id']) == $current_user_id;
+
+        if (!$is_teacher && !$is_owner) return ApiResponse::accessDenied();
+    
+        $sprints = Sprint::where('project_id', $data['project_id'])
+            ->orderBy('id', 'asc')
+            ->paginate(env('PAGINATION_LIMIT'));
+    
+        return response()->json(['data' => $sprints]);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Users\StoreUserRequest;
 use App\Models\ApiKey;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -14,6 +15,8 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 
 use App\Models\Role;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class RegisteredUserController extends Controller
 {
@@ -64,5 +67,76 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         return redirect('/admin/'.$request->identifier);
+    }
+
+    public function importWithExcel()
+    {
+        return view('auth.import-users-excel');
+    }
+
+    public function storeWithExcel(Request $request)
+    {
+        $required_rows = [
+            "full_name",
+            "identifier",
+            "role_id",
+            "email"
+        ];
+        $request->validate([
+            'file' => 'required|file|mimes:xls,xlsx'
+        ]);
+        $file = $request->file('file');
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+        $header = null;
+        $errors = [];
+        $created_users = 0;
+
+        foreach ($rows as $index => $row) {
+            if ($index === 0){
+                $header = $row;
+                $missing = array_diff($required_rows, $header);
+                
+                if (!empty($missing)) {
+                    return redirect()->back()->with([
+                        'message' => 'Er zijn geen verplichte kolommen in een Excel-bestand: ' . implode(', ', $missing)
+                    ]);
+                }
+
+                continue;
+            }
+
+            $data = [
+                'full_name' => $row[array_search('full_name', $header)],
+                'email' => $row[array_search('email', $header)],
+                'role_id' => $row[array_search('role_id', $header)],
+                'identifier' => $row[array_search('identifier', $header)],
+            ];
+            $userRequest = new StoreUserRequest();
+            $validator = Validator::make($data, $userRequest->rules());
+
+            if ($validator->fails()) {
+                $errors[$index] = $validator->errors();
+                continue;
+            }
+
+            $data['email'] = strtolower($data['email']);
+            $data['identifier'] = strtolower($data['identifier']);
+            $password = Str::random(12);
+            $data['password'] = Hash::make($password);
+
+            $user = User::create($data);
+            ApiKey::setApiKeyForUser($user->id);
+            $created_users = $created_users + 1;
+        }
+
+        $message = "Bestand is succesvol geïmporteerd";
+        if (!$created_users > 0) $message = "Het bestand bevat geen nieuwe gegevens om te importeren.";
+
+        return redirect()->back()->with([
+            'message' => $message,
+            'errors' => $errors,
+        ]);
     }
 }

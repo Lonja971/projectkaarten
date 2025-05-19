@@ -322,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon_id: parseInt(iconInput.value, 10),  // Convert to integer
                 background_id: parseInt(bgInput.value, 10),  // Convert to integer
                 api_key: "J7IzjpCTyiwQfF7XDJHYr0In7Z3er4BX",
-
             })
               .then(response => {
                 receivedData = response.data;
