@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 
 use App\Models\Role;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\MessageBag;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class RegisteredUserController extends Controller
@@ -69,29 +70,45 @@ class RegisteredUserController extends Controller
         return redirect('/admin/'.$request->identifier);
     }
 
+    /**
+     * Display the Excel import user form.
+     *
+     * @return \Illuminate\View\View
+     */
     public function importWithExcel()
     {
         return view('auth.import-users-excel');
     }
 
+    /**
+     * Handle the import of users from an uploaded Excel file.
+     *
+     * Validates the uploaded file, reads the content, checks for required columns,
+     * validates each row using `StoreUserRequest` rules, and creates users in the database.
+     * Also generates a default email using identifier and assigns a default role.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
     public function storeWithExcel(Request $request)
     {
         $required_rows = [
             "full_name",
-            "identifier",
-            "role_id",
-            "email"
+            "identifier"
         ];
         $request->validate([
-            'file' => 'required|file|mimes:xls,xlsx'
+            'file' => 'required|file|mimes:xls,xlsx,csv|max:'.env('MAX_FILE_SIZE')
         ]);
         $file = $request->file('file');
         $spreadsheet = IOFactory::load($file->getPathname());
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray();
         $header = null;
-        $errors = [];
         $created_users = 0;
+        $errors = new MessageBag();
 
         foreach ($rows as $index => $row) {
             if ($index === 0){
@@ -106,23 +123,26 @@ class RegisteredUserController extends Controller
 
                 continue;
             }
+            $full_name = $row[array_search('full_name', $header)];
+            $identifier = $row[array_search('identifier', $header)];
 
             $data = [
-                'full_name' => $row[array_search('full_name', $header)],
-                'email' => $row[array_search('email', $header)],
-                'role_id' => $row[array_search('role_id', $header)],
-                'identifier' => $row[array_search('identifier', $header)],
+                'full_name' => $full_name,
+                'identifier' => strtolower($identifier),
+                'email' => strtolower($identifier . env("STUDENT_EMAIL_DOMAIN")),
+                'role_id' => env("STUDENT_ROLE_ID"),
             ];
-            $userRequest = new StoreUserRequest();
-            $validator = Validator::make($data, $userRequest->rules());
+            $user_request = new StoreUserRequest();
+
+            $validator = Validator::make($data, $user_request->rules());
 
             if ($validator->fails()) {
-                $errors[$index] = $validator->errors();
+                foreach ($validator->errors()->all() as $message) {
+                    $errors->add("row_$index", "Rij {$index}: {$message}");
+                }
                 continue;
             }
 
-            $data['email'] = strtolower($data['email']);
-            $data['identifier'] = strtolower($data['identifier']);
             $password = Str::random(12);
             $data['password'] = Hash::make($password);
 
@@ -134,9 +154,8 @@ class RegisteredUserController extends Controller
         $message = "Bestand is succesvol geïmporteerd";
         if (!$created_users > 0) $message = "Het bestand bevat geen nieuwe gegevens om te importeren.";
 
-        return redirect()->back()->with([
-            'message' => $message,
-            'errors' => $errors,
-        ]);
+        return redirect()->back()
+        ->with('message', $message)
+        ->withErrors($errors);
     }
 }

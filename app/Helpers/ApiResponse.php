@@ -87,24 +87,24 @@ class ApiResponse
     */
     public static function invalidApiKey(): JsonResponse
     {
-        return self::errorWithMessage('Invalid or missing API Key', null, 401);
+        return self::errorWithMessage('Ongeldige of ontbrekende API-sleutel', null, 401);
     }
 
     public static function accessDenied(): JsonResponse
     {
-        return self::errorWithMessage('Access is denied', null, 403);
+        return self::errorWithMessage('Toegang geweigerd', null, 403);
     }
 
     public static function notFound(): JsonResponse
     {
-        return self::errorWithMessage('Not Found', null, 404);
+        return self::errorWithMessage('Niet gevonden', null, 404);
     }
     public static function noChangesDetected(): JsonResponse
     {
-        return self::successWithMessage('No changes detected', null);
+        return self::successWithMessage('Geen veranderingen gedetecteerd', null);
     }
     public static function noDataToUpdate(): JsonResponse
     {
-        return self::errorWithMessage('There is no data to update', null, 400);
+        return self::errorWithMessage('Er zijn geen gegevens om bij te werken', null, 400);
     }
 }

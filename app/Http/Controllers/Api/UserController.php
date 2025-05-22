@@ -28,7 +28,7 @@ class UserController extends Controller
         $data = $request->validated();
 
         $data['identifier'] = strtolower($data['identifier']);
-        $data['email'] = $data['identifier'] . "@st.deltion.nl";
+        $data['email'] = $data['identifier'] . env("STUDENT_EMAIL_DOMAIN");
         $password = Str::random(12);
         $data['password'] = Hash::make($password);
 
@@ -36,7 +36,7 @@ class UserController extends Controller
         $api_key = ApiKey::setApiKeyForUser($user->id);
 
         return ApiResponse::successWithMessage(
-            'User has been successfully created',
+            'Gebruiker is succesvol aangemaakt',
             array_merge($user->toArray(request()), ['api_key' => $api_key->api_key]),
         );
     }
@@ -104,7 +104,7 @@ class UserController extends Controller
         $user->update($data);
 
         return ApiResponse::successWithMessage(
-            'User updated successfully',
+            'Gebruiker succesvol bijgewerkt',
             new UserResource($user)
         );
     }
@@ -118,7 +118,7 @@ class UserController extends Controller
         $user->delete();
 
         return ApiResponse::successWithMessage(
-            'User successfully deleted'
+            'Gebruiker succesvol verwijderd'
         );
     }
 
@@ -135,7 +135,7 @@ class UserController extends Controller
             if (!$value) {
                 $missingParams[] = 'value';
             }
-            return ApiResponse::errorWithMessage('Missing search parameters ('. implode(', ', $missingParams) . ')', null, 400);
+            return ApiResponse::errorWithMessage('Ontbrekende zoekparameters ('. implode(', ', $missingParams) . ')', null, 400);
         }
 
         $users = User::where($column, 'LIKE', "%$value%")->get();

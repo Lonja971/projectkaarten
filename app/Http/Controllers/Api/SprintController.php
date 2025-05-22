@@ -13,9 +13,7 @@ use App\Models\ApiKey;
 use App\Models\Project;
 use App\Models\Sprint;
 use App\Models\SprintGoalAndRetrospective;
-use App\Models\SprintWorkprocess;
 use App\Models\User;
-use App\Models\Workprocess;
 use App\Services\Sprint\SprintGoalService;
 use App\Services\Sprint\SprintService;
 use App\Services\Sprint\SprintWorkprocessService;
@@ -86,7 +84,7 @@ class SprintController extends Controller
 
         if (Sprint::isDateAvailableForProject($data['project_id'], $data['date_start'], $data['date_end'])) {
             return ApiResponse::errorWithMessage(
-                'This date range overlaps with an existing sprint.',
+                'Dit datumbereik overlapt met een bestaande sprint',
                 null,
                 422
             );
@@ -107,7 +105,7 @@ class SprintController extends Controller
             : new SprintResource($new_sprint);
 
         return ApiResponse::successWithMessage(
-            'Sprint has been successfully created',
+            'Sprint is succesvol aangemaakt',
             $resource
         );
     }
@@ -186,7 +184,7 @@ class SprintController extends Controller
         $sprint['goals'] = SprintGoalAndRetrospective::with('workprocesses')->where('sprint_id', $sprint->id)->get();
     
         return ApiResponse::successWithMessage(
-            'Sprint updated successfully',
+            'Sprint succesvol bijgewerkt',
             new SprintWithGoalsResource($sprint)
         );
     }
@@ -209,7 +207,7 @@ class SprintController extends Controller
         $sprint->delete($id);
 
         return ApiResponse::successWithMessage(
-            'Sprint successfully deleted'
+            'Sprint succesvol verwijderd'
         );
     }
 }

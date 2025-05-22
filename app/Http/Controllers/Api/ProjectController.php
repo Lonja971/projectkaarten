@@ -74,7 +74,7 @@ class ProjectController extends Controller
         $new_project = Project::create($data);
 
         return ApiResponse::successWithMessage(
-            'Project has been successfully created',
+            'Project is succesvol aangemaakt',
             new ProjectResource($new_project)
         );
     }
@@ -137,7 +137,7 @@ class ProjectController extends Controller
         $project->update($data);
 
         return ApiResponse::successWithMessage(
-            'Project updated successfully',
+            'Project succesvol bijgewerkt',
             new ProjectResource($project)
         );
     }
@@ -161,7 +161,7 @@ class ProjectController extends Controller
         $project->delete($id);
 
         return ApiResponse::successWithMessage(
-            'Project successfully deleted'
+            'Project succesvol verwijderd'
         );
     }
 }

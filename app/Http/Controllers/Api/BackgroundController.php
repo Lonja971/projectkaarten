@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Background;
-use Illuminate\Http\Request;
 
 class BackgroundController extends Controller
 {
