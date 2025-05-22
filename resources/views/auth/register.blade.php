@@ -12,16 +12,6 @@
         <form method="POST" action="{{ route('register') }}" class="flex flex-col gap-[20px]">
             @csrf
 
-            @if ($errors->any())
-                <div class="flex flex-col gap-[8px]">
-                    <ul class="text-red-500 text-[16px]">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <div class="flex gap-[20px]">
                 <!-- Name -->   
                 <div class="flex flex-col gap-[8px]">
@@ -31,9 +21,9 @@
                 </div>
 
                 <!-- Role -->
-                <div class="flex flex-col gap-[8px]">
+                <div class="flex flex-col gap-[8px] min-w-[246px]">
                     <p class="text-[20px] text-[#000]">{{ __('Role') }}</p>
-                    <select id="role" name="role_id" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit">
+                    <select id="role" name="role_id" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter]">
                         @foreach($roles as $role)
                             <option value="{{$role->id}}"
                                 {{ old('role_id', 2) == $role->id ? 'selected' : '' }}>
@@ -61,7 +51,7 @@
                 <!-- Email Address -->
                 <div id="email_block" class="email-block-none flex flex-col gap-[8px]">
                     <p class="text-[20px] text-[#000]">{{ __('Email') }}</p>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" required autocomplete="username" placeholder="Email" />
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" class="!border-[0.5px] !border-[#ccc] !pl-[10px] !pr-[10px] !pt-[4px] !pb-[4px] !rounded-[100px] font-[Inter] !w-fit" autocomplete="username" placeholder="Email" />
                     <x-input-error :messages="$errors->get('email')" />
                 </div>
             </div>
@@ -93,8 +83,7 @@
             
             function updateIdentifierField() {
                 // Find the selected option text
-                console.log(roleSelect.value);
-                if (roleSelect.value === 1) {
+                if (roleSelect.value == 1) {
                     identifierLabel.textContent = 'Afkorting';
                     identifierInput.placeholder = 'Afkorting';
 

@@ -38,10 +38,17 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $teacherRoleId = env("TEACHER_ROLE_ID");
+        $identifier = strtolower($request->identifier);
+        $email = $request->email;
+
+        if ($request->role_id != $teacherRoleId || empty($email)) {
+            $email = $identifier . env("STUDENT_EMAIL_DOMAIN");
+        }
 
         $request->merge([
-            'email' => strtolower($request->email),
-            'identifier' => strtolower($request->identifier),
+            'email' => $email,
+            'identifier' => $identifier,
             'password' => Str::random(12),
         ]);
 

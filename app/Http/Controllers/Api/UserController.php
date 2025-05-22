@@ -28,7 +28,9 @@ class UserController extends Controller
         $data = $request->validated();
 
         $data['identifier'] = strtolower($data['identifier']);
-        $data['email'] = $data['identifier'] . env("STUDENT_EMAIL_DOMAIN");
+        if ($data['role_id'] != env("TEACHER_ROLE_ID") || empty($data['email'])) {
+            $data['email'] = $data['identifier'] . env("STUDENT_EMAIL_DOMAIN");
+        }
         $password = Str::random(12);
         $data['password'] = Hash::make($password);
 
